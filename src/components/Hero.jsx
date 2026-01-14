@@ -122,7 +122,7 @@ const Hero = () => {
   const isFullTextTyped = charIndex === fullString.length;
 
   return (
-    <div className="relative flex flex-col items-center mb-24">
+    <div className="relative flex flex-col items-center mb-12">
         
         {/* ROW 1: Icons -- Headline -- Icons */}
         <div className="w-full flex justify-between items-center mb-12">

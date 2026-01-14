@@ -5,7 +5,7 @@ import communityImg from '../assets/community.jpg';
 
 const BentoGrid = () => {
   return (
-    <div className="flex flex-col md:flex-row items-center justify-center gap-5 w-full max-w-[1400px] mx-auto mb-24 px-4">
+    <div className="flex flex-col md:flex-row items-center justify-center gap-5 w-full max-w-[1400px] mx-auto mb-6 px-4">
       
       {/* --- CARD 1: LOGO ONLY (Left Edge) --- */}
       {/* Shortest Height: h-[240px] */}
