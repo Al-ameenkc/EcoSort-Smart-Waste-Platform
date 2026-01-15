@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowUpRight, Leaf, Recycle, Sun, CircleDashed } from 'lucide-react';
+import { ArrowUpRight, Leaf, Recycle, Sun, CircleDashed, Heart } from 'lucide-react'; // Added Heart icon
+import { Link } from 'react-router-dom'; // Import Link
+import JoinUsModal from './JoinUsModal'; // Import the Modal
 
 const Hero = () => {
   // --- HERO DATA ---
@@ -35,76 +37,61 @@ const Hero = () => {
   const [charIndex, setCharIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isWaiting, setIsWaiting] = useState(false);
+  
+  // --- MODAL STATE ---
+  const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
 
-  // --- TYPEWRITER LOGIC (FIXED) ---
+  // --- TYPEWRITER LOGIC ---
   useEffect(() => {
     const currentPhase = heroContent[activeSlide];
     const fullText = `${currentPhase.textStart} ${currentPhase.highlight} ${currentPhase.textEnd}`;
     
-    // 1. Determine Speed based on current state
-    let delay = 50; // Standard typing speed
+    let delay = 50; 
     
     if (isDeleting) {
-        delay = 30; // Deleting speed (faster)
+        delay = 30; 
     } else if (isWaiting) {
-        delay = 3500; // Waiting speed (The long pause at the end)
+        delay = 3500; 
     }
 
-    // 2. The Logic Loop
     const handleType = () => {
-      // CASE A: We are in the "Waiting" phase (Text is full)
       if (isWaiting) {
-        // The delay has passed. Time to start deleting.
         setIsWaiting(false);
         setIsDeleting(true);
         return;
       }
 
-      // CASE B: We are Deleting
       if (isDeleting) {
         if (charIndex > 0) {
           setCharIndex(prev => prev - 1);
         } else {
-          // Finished deleting. Switch to next slide and start typing.
           setIsDeleting(false);
           setActiveSlide(prev => (prev + 1) % heroContent.length);
         }
         return;
       }
 
-      // CASE C: We are Typing
       if (!isDeleting) {
         if (charIndex < fullText.length) {
           setCharIndex(prev => prev + 1);
         } else {
-          // Finished typing. Enable waiting phase.
           setIsWaiting(true);
         }
       }
     };
 
-    // 3. Set the Master Timer
-    // Because 'delay' is dynamic, this timer handles typing, deleting, AND waiting.
-    // If 'activeSlide' changes (manual click), this timer is CLEARED immediately.
     const timer = setTimeout(handleType, delay);
-
-    // Cleanup: Kills the timer instantly if user interacts
     return () => clearTimeout(timer);
 
-  }, [charIndex, isDeleting, isWaiting, activeSlide]); // Dependencies ensure fresh timer on any change
+  }, [charIndex, isDeleting, isWaiting, activeSlide]);
 
-
-  // --- MANUAL OVERRIDE (Clicking Icons) ---
+  // --- MANUAL OVERRIDE ---
   const handleManualSlide = (index) => {
-    // 1. Change the slide content
     setActiveSlide(index);
-    // 2. Reset Typewriter State completely
     setCharIndex(0);
     setIsDeleting(false);
     setIsWaiting(false); 
-    // React will re-run the useEffect above, clearing any old timers and starting fresh.
   };
-
 
   // --- TEXT PARSER ---
   const currentData = heroContent[activeSlide];
@@ -118,10 +105,10 @@ const Hero = () => {
   const renderHighlight = currentText.slice(startLen + 1, startLen + 1 + highLen); 
   const renderEnd = currentText.slice(startLen + 1 + highLen + 1);
 
-  // Only show the blob when the *entire* sentence is finished
   const isFullTextTyped = charIndex === fullString.length;
 
   return (
+    <>
     <div className="relative flex flex-col items-center mb-12">
         
         {/* ROW 1: Icons -- Headline -- Icons */}
@@ -161,9 +148,6 @@ const Hero = () => {
                 )}
 
                 {renderEnd}
-
-                {/* No blinking cursor anymore */}
-
                 </h1>
             </div>
 
@@ -185,22 +169,42 @@ const Hero = () => {
 
         </div>
 
-        {/* ROW 2: Description -- Spacer -- Button */}
-        <div className="w-full flex flex-col md:flex-row items-start justify-between gap-10">
+        {/* ROW 2: Description -- Buttons */}
+        <div className="w-full flex flex-col md:flex-row items-center justify-between gap-10">
             <div className="md:w-1/3 pl-4">
-                <p className="text-gray-500 text-lg text-center md:text-left leading-relaxed max-w-xs">
+                <p className="text-gray-500 text-lg text-center md:text-left leading-relaxed max-w-xs mx-auto md:mx-0">
                   We are an organization that educates society about the problems of ecology and nature using AI technology.
                 </p>
             </div>
 
-            <div className="md:w-1/3 flex justify-center md:justify-end pr-4">
-                 <button className="bg-[#C3F53C] hover:bg-[#b2e32b] text-black transition-all px-10 py-4 rounded-full flex items-center gap-3 font-semibold text-lg shadow-xl shadow-lime-200/50 hover:scale-105 hover:shadow-lime-200/80">
-                    Start Earning <ArrowUpRight size={22} />
+            <div className="md:w-auto flex flex-col sm:flex-row items-center gap-4 pr-4">
+                 {/* BUTTON 1: START EARNING (Links to /book-pickup) */}
+                 <Link 
+                    to="/book-pickup"
+                    className="bg-[#C3F53C] hover:bg-[#b2e32b] text-black transition-all px-8 py-4 rounded-full flex items-center gap-3 font-semibold text-lg shadow-xl shadow-lime-200/50 hover:scale-105 hover:shadow-lime-200/80 group"
+                 >
+                    Start Earning <ArrowUpRight size={22} className="group-hover:rotate-45 transition-transform" />
+                 </Link>
+
+                 {/* BUTTON 2: JOIN US (Opens Modal) */}
+                 <button 
+                    onClick={() => setIsJoinModalOpen(true)}
+                    className="bg-white border border-slate-200 text-slate-900 hover:bg-slate-50 transition-all px-8 py-4 rounded-full flex items-center gap-3 font-semibold text-lg hover:scale-105"
+                 >
+                    <Heart size={20} className="text-[#C3F53C]" fill="currentColor" />
+                    Join Us
                  </button>
             </div>
         </div>
 
     </div>
+
+    {/* --- RENDER MODAL --- */}
+    <JoinUsModal 
+        isOpen={isJoinModalOpen} 
+        onClose={() => setIsJoinModalOpen(false)} 
+    />
+    </>
   );
 };
 

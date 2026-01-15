@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react'; // Import useState
 import { ArrowRight } from 'lucide-react';
+import JoinUsModal from './JoinUsModal'; // Import the Modal
 
 const CTA = () => {
+  const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
+
   return (
+    <>
     <section className="py-8 px-6 max-w-[1400px] mx-auto">
       
       <div className="bg-[#1a4032] rounded-[2.5rem] p-8 md:p-12 relative overflow-hidden flex flex-col items-center text-center">
@@ -26,8 +30,11 @@ const CTA = () => {
             </p>
 
             <div className="flex items-center justify-center">
-                {/* Primary Button Only */}
-                <button className="bg-[#C3F53C] hover:bg-[#b2e32b] text-[#1a4032] px-8 py-3 rounded-full font-bold text-base transition-all hover:scale-105 flex items-center gap-2">
+                {/* Primary Button -> Opens Modal */}
+                <button 
+                    onClick={() => setIsJoinModalOpen(true)}
+                    className="bg-[#C3F53C] hover:bg-[#b2e32b] text-[#1a4032] px-8 py-3 rounded-full font-bold text-base transition-all hover:scale-105 flex items-center gap-2"
+                >
                     Get Started Now
                     <ArrowRight size={18} />
                 </button>
@@ -36,6 +43,13 @@ const CTA = () => {
 
       </div>
     </section>
+
+    {/* --- RENDER MODAL --- */}
+    <JoinUsModal 
+        isOpen={isJoinModalOpen} 
+        onClose={() => setIsJoinModalOpen(false)} 
+    />
+    </>
   );
 };
 
