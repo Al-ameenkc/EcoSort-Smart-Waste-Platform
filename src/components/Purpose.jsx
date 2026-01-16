@@ -1,6 +1,10 @@
 import React from 'react';
 import { Recycle } from 'lucide-react';
 
+// 1. IMPORT YOUR IMAGE HERE
+// Make sure the path matches where you saved the file
+import girlRecyclingImg from '../assets/girl-recycling.jpg'; 
+
 const Purpose = () => {
   const benefits = [
     "Conservation of Natural Resources",
@@ -19,8 +23,8 @@ const Purpose = () => {
            <h2 className="text-3xl md:text-4xl font-medium text-slate-900 leading-[1.2] tracking-tight mb-4">
              Understanding the Purpose and <br className="hidden md:block"/>
              <span className="relative inline-block">
-                Necessity of Recycling
-                <span className="absolute bottom-1 left-0 w-full h-2 bg-[#E8F89C] -z-10 transform -rotate-1 rounded-full opacity-60"></span>
+               Necessity of Recycling
+               <span className="absolute bottom-1 left-0 w-full h-2 bg-[#E8F89C] -z-10 transform -rotate-1 rounded-full opacity-60"></span>
              </span>
            </h2>
 
@@ -48,8 +52,9 @@ const Purpose = () => {
            
            {/* IMAGE 1: Main (Tall Vertical) */}
            <div className="w-[85%] md:w-[70%] h-full rounded-[2rem] overflow-hidden shadow-xl relative z-0 group">
+              {/* 2. USE THE IMPORTED VARIABLE HERE */}
               <img 
-                src="https://images.unsplash.com/photo-1542601906990-b4d3fb77c335?q=80&w=1974&auto=format&fit=crop" 
+                src={girlRecyclingImg} 
                 alt="Girl Recycling" 
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               />
@@ -57,7 +62,6 @@ const Purpose = () => {
            </div>
 
            {/* IMAGE 2: Overlapping (Small Landscape) */}
-           {/* CHANGES: Height increased, width reduced, moved down */}
            <div className="absolute bottom-[-20px] left-0 md:left-8 w-[50%] h-[180px] rounded-[1.5rem] overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.15)] z-10 border-[5px] border-white group">
                <img 
                  src="https://images.unsplash.com/photo-1595278069441-2cf29f8005a4?q=80&w=2070&auto=format&fit=crop" 

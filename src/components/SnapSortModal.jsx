@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Upload, Camera, ScanLine } from 'lucide-react';
 
 const SnapSortModal = ({ isOpen, onClose, onImageSelect }) => {
@@ -6,29 +7,55 @@ const SnapSortModal = ({ isOpen, onClose, onImageSelect }) => {
 
   if (!isOpen) return null;
 
-  // Handle File Selection
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Create a fake URL for the uploaded image to display it immediately
       const imageUrl = URL.createObjectURL(file);
       onImageSelect(imageUrl);
     }
   };
 
-  // Trigger hidden input
   const triggerInput = () => {
     fileInputRef.current.click();
   };
 
-  return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
+      
+      {/* --- INTERNAL STYLES --- */}
+      <style>{`
+        @keyframes modalFadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes modalPopUp {
+          from { opacity: 0; transform: scale(0.95) translateY(20px); }
+          to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes scan {
+          0% { top: 10%; opacity: 0; }
+          50% { opacity: 1; }
+          100% { top: 90%; opacity: 0; }
+        }
+        .animate-backdrop {
+          animation: modalFadeIn 0.3s ease-out forwards;
+        }
+        .animate-modal {
+          animation: modalPopUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .animate-scan-line {
+          animation: scan 2s ease-in-out infinite;
+        }
+      `}</style>
+
+      {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" 
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-backdrop" 
         onClick={onClose}
       ></div>
 
-      <div className="relative z-10 w-full max-w-md bg-white rounded-[2rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      {/* Modal Content */}
+      <div className="relative z-10 w-full max-w-md bg-white rounded-[2rem] shadow-2xl overflow-hidden animate-modal">
         
         <button 
           onClick={onClose}
@@ -38,18 +65,13 @@ const SnapSortModal = ({ isOpen, onClose, onImageSelect }) => {
         </button>
 
         <div className="bg-gradient-to-br from-[#1a4032] to-[#0f291e] p-8 text-center relative overflow-hidden">
+            {/* Decoration */}
             <div className="absolute top-[-50%] left-[-20%] w-64 h-64 bg-[#C3F53C]/20 rounded-full blur-3xl"></div>
             
+            {/* Scanner Animation */}
             <div className="relative mx-auto w-20 h-20 bg-white/10 rounded-2xl flex items-center justify-center mb-6 backdrop-blur-md border border-white/10">
                 <ScanLine size={40} className="text-[#C3F53C]" />
-                <div className="absolute inset-0 border-t-2 border-[#C3F53C]/50 animate-[scan_2s_ease-in-out_infinite]"></div>
-                <style>{`
-                  @keyframes scan {
-                    0% { top: 10%; opacity: 0; }
-                    50% { opacity: 1; }
-                    100% { top: 90%; opacity: 0; }
-                  }
-                `}</style>
+                <div className="absolute inset-0 border-t-2 border-[#C3F53C]/50 animate-scan-line"></div>
             </div>
 
             <h2 className="text-2xl font-bold text-white mb-2">Snap-Sort AI</h2>
@@ -60,7 +82,6 @@ const SnapSortModal = ({ isOpen, onClose, onImageSelect }) => {
 
         <div className="p-8 space-y-4">
             
-            {/* HIDDEN FILE INPUT */}
             <input 
                 type="file" 
                 ref={fileInputRef} 
@@ -69,7 +90,6 @@ const SnapSortModal = ({ isOpen, onClose, onImageSelect }) => {
                 onChange={handleFileChange}
             />
             
-            {/* Upload Button */}
             <button 
                 onClick={triggerInput}
                 className="w-full flex items-center gap-4 p-4 rounded-2xl border border-slate-200 hover:border-green-500 hover:bg-green-50/50 transition-all group text-left"
@@ -83,7 +103,6 @@ const SnapSortModal = ({ isOpen, onClose, onImageSelect }) => {
                 </div>
             </button>
 
-            {/* Snap Button (Same logic, mobile browsers will offer camera option) */}
             <button 
                 onClick={triggerInput}
                 className="w-full flex items-center gap-4 p-4 rounded-2xl bg-[#1a4032] hover:bg-[#143328] text-white transition-all shadow-lg hover:shadow-xl group text-left"
@@ -100,7 +119,8 @@ const SnapSortModal = ({ isOpen, onClose, onImageSelect }) => {
         </div>
 
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

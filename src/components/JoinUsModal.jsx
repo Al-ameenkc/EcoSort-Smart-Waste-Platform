@@ -1,19 +1,39 @@
 import React from 'react';
+import { createPortal } from 'react-dom'; 
 import { X, User, Phone, MessageCircle, Heart } from 'lucide-react';
 
 const JoinUsModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center px-4">
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
+      
+      {/* --- INTERNAL STYLES FOR GUARANTEED ANIMATION --- */}
+      <style>{`
+        @keyframes modalFadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes modalPopUp {
+          from { opacity: 0; transform: scale(0.95) translateY(20px); }
+          to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .animate-backdrop {
+          animation: modalFadeIn 0.3s ease-out forwards;
+        }
+        .animate-modal {
+          animation: modalPopUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+      `}</style>
+
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" 
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-backdrop" 
         onClick={onClose}
       ></div>
 
       {/* Modal Content */}
-      <div className="relative z-10 w-full max-w-sm bg-white rounded-[2rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative z-10 w-full max-w-sm bg-white rounded-[2rem] shadow-2xl overflow-hidden animate-modal">
         
         {/* Close Button */}
         <button 
@@ -23,12 +43,13 @@ const JoinUsModal = ({ isOpen, onClose }) => {
           <X size={16} />
         </button>
 
-        {/* Header */}
+        {/* Header Section */}
         <div className="bg-[#1a4032] p-8 text-center relative overflow-hidden">
+            {/* Decoration */}
             <div className="absolute top-[-50%] left-[-20%] w-48 h-48 bg-[#C3F53C]/20 rounded-full blur-3xl"></div>
             
             <div className="relative z-10">
-                <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4 text-[#C3F53C] backdrop-blur-md">
+                <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4 text-[#C3F53C] backdrop-blur-md border border-white/10">
                     <Heart size={24} fill="currentColor" />
                 </div>
                 <h2 className="text-2xl font-bold text-white mb-1">Join the Movement</h2>
@@ -36,7 +57,7 @@ const JoinUsModal = ({ isOpen, onClose }) => {
             </div>
         </div>
 
-        {/* Form */}
+        {/* Form Section */}
         <div className="p-6 space-y-4">
             
             <div className="space-y-1">
@@ -76,7 +97,8 @@ const JoinUsModal = ({ isOpen, onClose }) => {
         </div>
 
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

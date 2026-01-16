@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowUpRight, Leaf, Recycle, Sun, CircleDashed, Heart } from 'lucide-react'; // Added Heart icon
-import { Link } from 'react-router-dom'; // Import Link
-import JoinUsModal from './JoinUsModal'; // Import the Modal
+import { ArrowUpRight, Leaf, Recycle, Sun, CircleDashed, Heart } from 'lucide-react'; 
+import { Link } from 'react-router-dom'; 
+import JoinUsModal from './JoinUsModal'; 
 
 const Hero = () => {
   // --- HERO DATA ---
@@ -111,10 +111,42 @@ const Hero = () => {
     <>
     <div className="relative flex flex-col items-center mb-12">
         
-        {/* ROW 1: Icons -- Headline -- Icons */}
+        {/* --- MOBILE ICONS ROW (Visible only on Mobile) --- */}
+        {/* Added h-24 and items-center to contain the large scaling without layout shifts */}
+        <div className="flex md:hidden gap-6 mb-8 justify-center w-full items-center h-24 px-4">
+            <button 
+                onClick={() => handleManualSlide(0)}
+                // UPDATED CLASSNAMES: Added scale-125/scale-90, opacity, and stronger rings
+                className={`w-14 h-14 rounded-full flex items-center justify-center shadow-sm transition-all duration-500 ease-in-out ${activeSlide === 0 ? 'bg-[#E8F89C] ring-4 ring-[#E8F89C]/30 scale-125 z-10' : 'bg-gray-100 scale-90 opacity-70'}`}
+            >
+                {/* Icon size also changes slightly */}
+                <Recycle size={activeSlide === 0 ? 24 : 20} className={`transition-colors duration-500 ${activeSlide === 0 ? 'text-black' : 'text-gray-400'}`} />
+            </button>
+            <button 
+                onClick={() => handleManualSlide(1)}
+                className={`w-14 h-14 rounded-full flex items-center justify-center shadow-sm transition-all duration-500 ease-in-out ${activeSlide === 1 ? 'bg-[#064e3b] ring-4 ring-[#064e3b]/30 scale-125 z-10' : 'bg-gray-100 scale-90 opacity-70'}`}
+            >
+                <Leaf size={activeSlide === 1 ? 22 : 18} className={`transition-colors duration-500 ${activeSlide === 1 ? 'text-white' : 'text-green-800'}`} />
+            </button>
+            <button 
+                onClick={() => handleManualSlide(2)}
+                className={`w-14 h-14 rounded-full flex items-center justify-center shadow-sm transition-all duration-500 ease-in-out ${activeSlide === 2 ? 'bg-[#F1FCC2] ring-4 ring-[#F1FCC2]/30 scale-125 z-10' : 'bg-gray-100 scale-90 opacity-70'}`}
+            >
+                <Sun size={activeSlide === 2 ? 26 : 22} className={`transition-colors duration-500 ${activeSlide === 2 ? 'text-[#84CC16]' : 'text-gray-400'}`} />
+            </button>
+            <button 
+                onClick={() => handleManualSlide(3)}
+                className={`w-14 h-14 rounded-full flex items-center justify-center shadow-sm transition-all duration-500 ease-in-out ${activeSlide === 3 ? 'bg-white border-green-800/20 ring-4 ring-green-100 scale-125 z-10' : 'bg-gray-100 scale-90 opacity-70'}`}
+            >
+                <CircleDashed size={activeSlide === 3 ? 22 : 18} className={`transition-colors duration-500 ${activeSlide === 3 ? 'text-green-800' : 'text-gray-400'}`} />
+            </button>
+        </div>
+
+
+        {/* ROW 1: Desktop Icons -- Headline -- Desktop Icons */}
         <div className="w-full flex justify-between items-center mb-12">
             
-            {/* --- LEFT ICONS CLUSTER --- */}
+            {/* --- LEFT ICONS CLUSTER (Desktop Only) --- */}
             <div className="hidden md:flex flex-col items-start">
                 <button 
                     onClick={() => handleManualSlide(0)}
@@ -151,7 +183,7 @@ const Hero = () => {
                 </h1>
             </div>
 
-            {/* --- RIGHT ICONS CLUSTER --- */}
+            {/* --- RIGHT ICONS CLUSTER (Desktop Only) --- */}
             <div className="hidden md:flex flex-col items-end">
                 <button 
                     onClick={() => handleManualSlide(2)}

@@ -1,4 +1,6 @@
 import React from 'react';
+// 1. IMPORT THE LOCAL IMAGE
+import impactImg from '../assets/impact.jpg';
 
 const ProcessImpact = () => {
   return (
@@ -45,8 +47,9 @@ const ProcessImpact = () => {
         {/* --- CENTER COLUMN: IMAGE --- */}
         {/* Reduced Height: h-[500px] -> h-[400px] */}
         <div className="h-[400px] w-full rounded-[2rem] overflow-hidden shadow-xl order-1 lg:order-2 relative group">
+            {/* 2. USE THE IMPORTED VARIABLE HERE */}
             <img 
-                src="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?q=80&w=2070&auto=format&fit=crop" 
+                src={impactImg} 
                 alt="Recycling Facility Process" 
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
             />

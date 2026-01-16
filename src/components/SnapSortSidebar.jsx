@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom'; 
 import { X, Bot, CheckCircle, ChevronRight } from 'lucide-react';
 
-// Added 'onScanAgain' prop to handle the loop
 const SnapSortSidebar = ({ isOpen, onClose, image, onScanAgain }) => {
   const [status, setStatus] = useState('analyzing'); 
 
@@ -18,21 +18,38 @@ const SnapSortSidebar = ({ isOpen, onClose, image, onScanAgain }) => {
   if (!isOpen) return null;
 
   const handleFindBin = () => {
-    // Simple alert for now as requested
     alert("This feature is currently under development.");
   };
 
-  return (
-    <div className="fixed inset-0 z-[70] flex justify-end">
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex justify-end">
       
+      {/* --- INTERNAL STYLES --- */}
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes slideInRight {
+          from { transform: translateX(100%); }
+          to { transform: translateX(0); }
+        }
+        .animate-backdrop {
+          animation: fadeIn 0.5s ease-out forwards;
+        }
+        .animate-sidebar {
+          animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+      `}</style>
+
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-black/20 backdrop-blur-sm transition-opacity" 
+        className="absolute inset-0 bg-black/20 backdrop-blur-sm animate-backdrop" 
         onClick={onClose}
       ></div>
 
-      {/* --- SIDEBAR PANEL --- */}
-      <div className="relative z-10 w-full md:w-[450px] bg-white h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+      {/* Sidebar Panel */}
+      <div className="relative z-10 w-full md:w-[450px] bg-white h-full shadow-2xl flex flex-col animate-sidebar">
         
         {/* HEADER */}
         <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-white/80 backdrop-blur-md sticky top-0 z-20">
@@ -95,7 +112,6 @@ const SnapSortSidebar = ({ isOpen, onClose, image, onScanAgain }) => {
                     {/* RESULT CARD */}
                     <div className="w-[90%] bg-white rounded-2xl rounded-tl-none shadow-lg overflow-hidden border border-slate-100">
                         
-                        {/* Status Header */}
                         <div className="bg-green-50 p-4 border-b border-green-100 flex items-center gap-3">
                             <CheckCircle className="text-green-600" size={24} />
                             <div>
@@ -104,7 +120,6 @@ const SnapSortSidebar = ({ isOpen, onClose, image, onScanAgain }) => {
                             </div>
                         </div>
 
-                        {/* Details Body */}
                         <div className="p-5 space-y-4">
                             <div>
                                 <h5 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Identified Object</h5>
@@ -131,12 +146,9 @@ const SnapSortSidebar = ({ isOpen, onClose, image, onScanAgain }) => {
                                     </li>
                                 </ul>
                             </div>
-
                         </div>
 
-                        {/* Footer Action */}
                         <div className="p-3 bg-slate-50 border-t border-slate-100 flex justify-end">
-                            {/* UPDATED: Added onClick handler */}
                             <button 
                                 onClick={handleFindBin}
                                 className="text-xs font-bold text-[#1a4032] flex items-center gap-1 hover:underline"
@@ -152,7 +164,6 @@ const SnapSortSidebar = ({ isOpen, onClose, image, onScanAgain }) => {
 
         {/* FOOTER INPUT */}
         <div className="p-4 border-t border-slate-100 bg-white sticky bottom-0">
-             {/* UPDATED: Calls onScanAgain prop */}
              <button 
                 onClick={onScanAgain}
                 className="w-full py-3 rounded-xl border border-slate-200 text-slate-500 text-sm font-medium hover:bg-slate-50 hover:text-slate-900 transition-colors"
@@ -162,7 +173,8 @@ const SnapSortSidebar = ({ isOpen, onClose, image, onScanAgain }) => {
         </div>
 
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
