@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import AboutUs from './pages/AboutUs';
 import BookPickup from './pages/BookPickup';
 import EcoBotSidebar from './components/EcoBotSidebar'; // <--- Import Sidebar
+import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
   // State for the Global Eco-AI Sidebar
@@ -27,6 +28,7 @@ function App() {
 
         {/* Routes */}
         <Routes>
+          <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/book-pickup" element={<BookPickup />} />

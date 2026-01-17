@@ -17,21 +17,13 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // --- ANIMATION STATE ---
-  // Phases: 'idle' -> 'driving-out' -> 'teleport-left' -> 'driving-in' -> 'complete'
   const [animPhase, setAnimPhase] = useState('idle');
 
   useEffect(() => {
-    // 1. Start Driving Out (Left -> Right Offscreen)
     setTimeout(() => setAnimPhase('driving-out'), 100);
-
-    // 2. Teleport to Left (Invisible)
-    setTimeout(() => setAnimPhase('teleport-left'), 1600); // 1.5s drive time
-
-    // 3. Start Driving In (Left Offscreen -> Home)
-    setTimeout(() => setAnimPhase('driving-in'), 1700); // 100ms buffer for teleport
-
-    // 4. Finish
-    setTimeout(() => setAnimPhase('complete'), 3200); // 1.5s return time
+    setTimeout(() => setAnimPhase('teleport-left'), 1600); 
+    setTimeout(() => setAnimPhase('driving-in'), 1700); 
+    setTimeout(() => setAnimPhase('complete'), 3200); 
   }, []);
 
   useEffect(() => {
@@ -65,41 +57,28 @@ const Navbar = () => {
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
   // --- ANIMATION STYLES ---
-  
   const getLogoStyle = () => {
     const base = "h-10 w-auto object-contain z-[70] relative";
-    
     switch (animPhase) {
-        case 'idle':
-            return `${base} translate-x-0`;
-        case 'driving-out':
-            // Drive off screen to the right (100vw ensures it leaves the viewport)
-            return `${base} transition-transform duration-[1500ms] ease-in translate-x-[100vw]`;
-        case 'teleport-left':
-            // Instantly move to left off-screen (no transition)
-            return `${base} duration-0 -translate-x-[100vw] opacity-0`;
-        case 'driving-in':
-            // Drive back to 0 from left
-            return `${base} transition-transform duration-[1500ms] ease-out translate-x-0 opacity-100`;
-        case 'complete':
-        default:
-            return `${base} translate-x-0`;
+        case 'idle': return `${base} translate-x-0`;
+        case 'driving-out': return `${base} transition-transform duration-[1500ms] ease-in translate-x-[100vw]`;
+        case 'teleport-left': return `${base} duration-0 -translate-x-[100vw] opacity-0`;
+        case 'driving-in': return `${base} transition-transform duration-[1500ms] ease-out translate-x-0 opacity-100`;
+        case 'complete': default: return `${base} translate-x-0`;
     }
   };
 
   const getContentStyle = () => {
-    // Hide content until the car has driven off (teleport phase or later)
     if (animPhase === 'idle' || animPhase === 'driving-out') {
         return "opacity-0 translate-y-2 pointer-events-none";
     }
-    // Fade in while car drives back in
     return "opacity-100 translate-y-0 transition-all duration-1000 ease-out"; 
   };
 
   return (
     <>
-      {/* Overflow-hidden on nav prevents horizontal scrollbar during animation */}
-      <nav className="fixed top-0 w-full z-50 bg-white/20 backdrop-blur-sm border-b border-white/20 shadow-sm transition-all duration-300 overflow-hidden">
+      {/* FIX: Removed 'overflow-hidden' class from here so Dropdown can show */}
+      <nav className="fixed top-0 w-full z-50 bg-white/20 backdrop-blur-sm border-b border-white/20 shadow-sm transition-all duration-300">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between relative">
           
           {/* LOGO LINK */}

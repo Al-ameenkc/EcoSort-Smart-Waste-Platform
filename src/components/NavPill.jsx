@@ -3,7 +3,9 @@ import React from 'react';
 const NavPill = ({ icon, text }) => {
   return (
     // WRAPPER
-    <a href="#" className="inline-flex items-center h-10 transition-transform duration-300 hover:scale-105 group">
+    // CHANGED: <a> to <div> to fix the "Link inside Link" error.
+    // ADDED: 'cursor-pointer' to keep the hand icon on hover.
+    <div className="inline-flex items-center h-10 transition-transform duration-300 hover:scale-105 group cursor-pointer">
       
       {/* BUTTON CONTENT
           - Resting: bg-transparent (Shows Navbar background)
@@ -22,7 +24,7 @@ const NavPill = ({ icon, text }) => {
         <span className="font-semibold text-sm tracking-wide text-slate-800">{text}</span>
       </div>
 
-    </a>
+    </div>
   );
 };
 

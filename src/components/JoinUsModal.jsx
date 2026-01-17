@@ -1,9 +1,47 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { createPortal } from 'react-dom'; 
-import { X, User, Phone, MessageCircle, Heart } from 'lucide-react';
+import { X, User, Phone, MessageCircle, Heart, Loader2, CheckCircle } from 'lucide-react';
+import { joinMovement } from '../services/volunteerService'; // Import the service
 
 const JoinUsModal = ({ isOpen, onClose }) => {
+  // 1. STATE FOR FORM DATA
+  const [formData, setFormData] = useState({
+    fullName: '',
+    phone: '',
+    whatsapp: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   if (!isOpen) return null;
+
+  // 2. HANDLE INPUT CHANGES
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // 3. HANDLE SUBMIT
+  const handleSubmit = async () => {
+    // Basic Validation
+    if (!formData.fullName || !formData.phone) {
+        alert("Please enter your Name and Phone Number.");
+        return;
+    }
+
+    setIsSubmitting(true);
+
+    // Send to Firebase
+    const result = await joinMovement(formData);
+
+    if (result.success) {
+        alert("Welcome to the movement! 🌍 We will contact you soon.");
+        setFormData({ fullName: '', phone: '', whatsapp: '' }); // Clear form
+        onClose(); // Close modal
+    } else {
+        alert("Something went wrong. Please check your connection.");
+    }
+
+    setIsSubmitting(false);
+  };
 
   return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
@@ -64,7 +102,14 @@ const JoinUsModal = ({ isOpen, onClose }) => {
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Full Name</label>
                 <div className="relative">
                     <User size={16} className="absolute left-3 top-3 text-slate-400" />
-                    <input type="text" placeholder="Your Name" className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-green-500 transition-colors" />
+                    <input 
+                        name="fullName"
+                        value={formData.fullName}
+                        onChange={handleChange}
+                        type="text" 
+                        placeholder="Your Name" 
+                        className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-green-500 transition-colors" 
+                    />
                 </div>
             </div>
 
@@ -72,7 +117,14 @@ const JoinUsModal = ({ isOpen, onClose }) => {
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Phone Number</label>
                 <div className="relative">
                     <Phone size={16} className="absolute left-3 top-3 text-slate-400" />
-                    <input type="tel" placeholder="+234..." className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-green-500 transition-colors" />
+                    <input 
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        type="tel" 
+                        placeholder="+234..." 
+                        className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-green-500 transition-colors" 
+                    />
                 </div>
             </div>
 
@@ -80,7 +132,14 @@ const JoinUsModal = ({ isOpen, onClose }) => {
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">WhatsApp Number</label>
                 <div className="relative">
                     <MessageCircle size={16} className="absolute left-3 top-3 text-slate-400" />
-                    <input type="tel" placeholder="+234..." className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-green-500 transition-colors" />
+                    <input 
+                        name="whatsapp"
+                        value={formData.whatsapp}
+                        onChange={handleChange}
+                        type="tel" 
+                        placeholder="+234..." 
+                        className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-green-500 transition-colors" 
+                    />
                 </div>
             </div>
 
@@ -90,8 +149,16 @@ const JoinUsModal = ({ isOpen, onClose }) => {
                 </p>
             </div>
 
-            <button className="w-full bg-[#1a4032] hover:bg-[#143328] text-white font-bold py-3 rounded-xl transition-all hover:scale-[1.02] shadow-lg">
-                Join Us
+            <button 
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="w-full bg-[#1a4032] hover:bg-[#143328] text-white font-bold py-3 rounded-xl transition-all hover:scale-[1.02] shadow-lg flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+                {isSubmitting ? (
+                    <>Joining... <Loader2 className="animate-spin" size={18} /></>
+                ) : (
+                    "Join Us"
+                )}
             </button>
 
         </div>
