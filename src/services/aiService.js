@@ -3,13 +3,11 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey);
 
-// OPTIMIZED LIST: Put the working model FIRST.
+// The "Safe List" - Tries the newest lite model, then falls back to standard
 const MODEL_CANDIDATES = [
-  "gemini-2.5-flash-lite",      // ✅ The Winner (Fastest)
-  "gemini-2.0-flash",           // Backup 1
-  "gemini-2.0-flash-exp",       // Backup 2
-  "gemini-1.5-flash",           // Old Standard (Region locked for you)
-  "gemini-pro"                  // Legacy
+  "gemini-2.5-flash-lite", // Fast & Good
+  "gemini-1.5-flash",      // Standard & Reliable
+  "gemini-2.0-flash-exp"   // Backup
 ];
 
 const fileToGenerativePart = async (imageUrl) => {
@@ -38,16 +36,17 @@ export const identifyWaste = async (imageUrl) => {
     { "itemName": "Item", "isRecyclable": true, "confidence": 100, "reasoning": "...", "handlingTips": [] }
   `;
 
-  // Try models in order (Winner is first now!)
   for (const modelName of MODEL_CANDIDATES) {
     try {
+      console.log(`🤖 Testing ${modelName}...`);
       const model = genAI.getGenerativeModel({ model: modelName });
       
       const result = await model.generateContent([prompt, imagePart]);
       const response = await result.response;
       const text = response.text();
       
-      // Clean and Parse
+      console.log(`✅ Success with ${modelName}!`);
+      
       let cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
       const firstBrace = cleanText.indexOf('{');
       const lastBrace = cleanText.lastIndexOf('}');
@@ -56,21 +55,16 @@ export const identifyWaste = async (imageUrl) => {
       return JSON.parse(cleanText);
 
     } catch (error) {
-      // If rate limited, wait a bit and try the NEXT model
-      if (error.message.includes("429")) {
-          console.warn(`⚠️ ${modelName} busy. Trying next...`);
-          await new Promise(r => setTimeout(r, 2000));
-          continue;
-      }
-      console.warn(`❌ ${modelName} failed. Trying next...`);
+      console.warn(`❌ ${modelName} failed:`, error.message);
+      // Wait 1s before next try to be safe
+      await new Promise(r => setTimeout(r, 1000));
     }
   }
 
-  throw new Error("Could not identify image. Please try again later.");
+  throw new Error("Could not identify image. Please try again.");
 };
 
 export const chatAboutWaste = async (message, context) => {
-    // Try the list for chat too
     for (const modelName of MODEL_CANDIDATES) {
         try {
             const model = genAI.getGenerativeModel({ model: modelName });
@@ -79,4 +73,4 @@ export const chatAboutWaste = async (message, context) => {
         } catch (e) { continue; }
     }
     return "I'm having trouble connecting right now.";
-  };
+};
