@@ -27,6 +27,20 @@ const Navbar = () => {
   }, []);
 
   useEffect(() => {
+    // 1. Function to open Scanner
+    const handleOpenScanner = () => {
+        setIsSnapModalOpen(true);
+        setIsSidebarOpen(false); // Close sidebar if open
+    };
+
+    // 2. Listen for 'open-snapsort' event
+    window.addEventListener('open-snapsort', handleOpenScanner);
+
+    // 3. Cleanup
+    return () => window.removeEventListener('open-snapsort', handleOpenScanner);
+  }, []);
+
+  useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = 'hidden';
     } else {
@@ -77,7 +91,6 @@ const Navbar = () => {
 
   return (
     <>
-      {/* FIX: Removed 'overflow-hidden' class from here so Dropdown can show */}
       <nav className="fixed top-0 w-full z-50 bg-white/20 backdrop-blur-sm border-b border-white/20 shadow-sm transition-all duration-300">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between relative">
           

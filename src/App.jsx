@@ -5,14 +5,14 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import AboutUs from './pages/AboutUs';
 import BookPickup from './pages/BookPickup';
-import EcoBotSidebar from './components/EcoBotSidebar'; // <--- Import Sidebar
+import EcoBotSidebar from './components/EcoBotSidebar'; // ✅ Imported Sidebar
 import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
   // State for the Global Eco-AI Sidebar
   const [isEcoAiOpen, setIsEcoAiOpen] = useState(false);
 
-  // Listen for the custom 'open-eco-ai' event (triggered by Footer)
+  // Listen for the custom 'open-eco-ai' event (triggered by Footer or other deep links)
   useEffect(() => {
     const handleOpen = () => setIsEcoAiOpen(true);
     window.addEventListener('open-eco-ai', handleOpen);
@@ -23,8 +23,10 @@ function App() {
     <Router>
       <div className="min-h-screen bg-white text-primary font-sans selection:bg-[#C3F53C] selection:text-black overflow-x-hidden">
         
-        {/* Navbar */}
-        <Navbar />
+        {/* Navbar 
+            Pass the open function directly since it's a child 
+        */}
+        <Navbar onOpenEcoAi={() => setIsEcoAiOpen(true)} />
 
         {/* Routes */}
         <Routes>
