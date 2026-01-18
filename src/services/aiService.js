@@ -1,14 +1,3 @@
-import OpenAI from "openai";
-
-const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-
-// Initialize OpenAI
-// "dangerouslyAllowBrowser: true" is required because we are running this 
-// directly in React (Frontend) instead of a Backend server.
-const openai = new OpenAI({
-  apiKey: apiKey,
-  dangerouslyAllowBrowser: true 
-});
 
 const SYSTEM_INSTRUCTION = `
 You are Eco-AI, the official assistant for KanemWaste.
