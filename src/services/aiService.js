@@ -42,7 +42,7 @@ When a user wants to perform an action, you MUST provide a button using this EXA
 - If asked about other topics, politely refuse.
 `;
 
-// Helper: Convert Image URL to Base64 (OpenAI needs the raw image data string)
+// Helper: Convert Image to Base64 (Keep this)
 const imageUrlToBase64 = async (url) => {
   const response = await fetch(url);
   const blob = await response.blob();
@@ -53,15 +53,33 @@ const imageUrlToBase64 = async (url) => {
   });
 };
 
+// --- NEW FUNCTION: Call Vercel API ---
+async function callMySecureAPI(messages, jsonMode = false) {
+    try {
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: "gpt-4o-mini",
+                messages: messages,
+                response_format: jsonMode ? { type: "json_object" } : undefined
+            })
+        });
+
+        const data = await response.json();
+        return data.content;
+    } catch (error) {
+        console.error("API Error:", error);
+        throw new Error("Failed to connect to AI server.");
+    }
+}
+
 export const identifyWaste = async (imageUrl) => {
   try {
     const base64Image = await imageUrlToBase64(imageUrl);
     
-    console.log("🤖 Asking OpenAI (gpt-4o-mini) to analyze image...");
-    
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini", // Cost-effective vision model
-      messages: [
+    // Construct the message payload
+    const messages = [
         {
           role: "system",
           content: `${SYSTEM_INSTRUCTION} \n\n TASK: Analyze this waste. Return ONLY valid JSON.`
@@ -73,16 +91,14 @@ export const identifyWaste = async (imageUrl) => {
             { type: "image_url", image_url: { url: base64Image } }
           ]
         }
-      ],
-      response_format: { type: "json_object" } // Forces OpenAI to give perfect JSON
-    });
+    ];
 
-    const content = response.choices[0].message.content;
+    const content = await callMySecureAPI(messages, true); // true = expect JSON
     return JSON.parse(content);
 
   } catch (error) {
-    console.error("OpenAI Error:", error);
-    throw new Error("Could not analyze image. Please check your internet or API key.");
+    console.error("Identify Error:", error);
+    throw new Error("Could not analyze image.");
   }
 };
 
@@ -92,21 +108,16 @@ export const chatAboutWaste = async (message, context) => {
         ? `User is currently looking at: ${context.itemName}.` 
         : "General recycling question.";
 
-    console.log("🤖 Chatting with OpenAI (gpt-4o-mini)...");
-
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
+    const messages = [
         { role: "system", content: SYSTEM_INSTRUCTION },
         { role: "system", content: `CONTEXT: ${contextString}` },
         { role: "user", content: message }
-      ]
-    });
+    ];
 
-    return response.choices[0].message.content;
+    return await callMySecureAPI(messages, false);
 
   } catch (error) {
-    console.error("OpenAI Chat Error:", error);
-    return "I'm having trouble connecting to the server. Please check your internet connection.";
+    console.error("Chat Error:", error);
+    return "I'm having trouble connecting to the server.";
   }
 };
