@@ -4,6 +4,7 @@ import PageWrapper from '../components/PageWrapper';
 import { db } from '../firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'; 
 import imageCompression from 'browser-image-compression';
+import emailjs from '@emailjs/browser'; // <--- 1. Import EmailJS
 
 // --- CUSTOM HELPER FOR BASE64 ---
 const convertToBase64 = (file) => {
@@ -100,7 +101,6 @@ const BookPickup = () => {
 
     setIsLocating(true);
 
-    // OPTIONS: Force GPS / High Accuracy
     const options = {
         enableHighAccuracy: true,
         timeout: 10000,
@@ -112,7 +112,6 @@ const BookPickup = () => {
             const { latitude, longitude } = position.coords;
             
             try {
-                // Using OpenStreetMap Nominatim API
                 const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
                 const data = await response.json();
 
@@ -136,7 +135,7 @@ const BookPickup = () => {
             alert("Unable to retrieve location. Please check your GPS settings.");
             setIsLocating(false);
         },
-        options // Pass the high accuracy options here
+        options 
     );
   };
 
@@ -179,6 +178,19 @@ const BookPickup = () => {
             imageUrl = await convertToBase64(imageFile);
         }
 
+        // 2. Prepare Data for Email
+        // We need to map your formData keys to the Template Variable names you set in EmailJS
+        const emailParams = {
+            user_name: formData.fullName,
+            user_phone: formData.phone,
+            user_address: formData.address + (formData.landmark ? ` (Landmark: ${formData.landmark})` : ''),
+            waste_type: formData.wasteType,
+            bag_size: formData.bagSize || "Not specified", // <--- Added fallback text
+            count: formData.count,
+            pickup_date: new Date().toLocaleDateString()
+        };
+
+        // 3. Send to Firebase (Keep this!)
         await addDoc(collection(db, "pickups"), {
             ...formData,
             imageUrl: imageUrl, 
@@ -186,7 +198,17 @@ const BookPickup = () => {
             createdAt: serverTimestamp()
         });
 
-        alert("Request Submitted Successfully! 🚛 We will contact you soon.");
+        // 4. Send Email via EmailJS (New Addition!)
+        console.log("📨 Sending these params to EmailJS:", emailParams); 
+
+        await emailjs.send(
+            import.meta.env.VITE_EMAILJS_SERVICE_ID,
+            import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+            emailParams, // <--- We send the params object, NOT the formRef
+            import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+        );
+
+        alert("Request Submitted Successfully! 🚛 We have received your order.");
         
         setFormData({ fullName: '', phone: '', address: '', landmark: '', wasteType: '', bagSize: '', count: 1 });
         setImageFile(null);

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom'; 
-import { X, User, Phone, MessageCircle, Heart, Loader2, CheckCircle } from 'lucide-react';
-import { joinMovement } from '../services/volunteerService'; // Import the service
+import { X, User, Phone, MessageCircle, Heart, Loader2 } from 'lucide-react';
+import { joinMovement } from '../services/volunteerService'; 
+import emailjs from '@emailjs/browser'; // <--- 1. Import EmailJS
 
 const JoinUsModal = ({ isOpen, onClose }) => {
-  // 1. STATE FOR FORM DATA
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
@@ -14,12 +14,10 @@ const JoinUsModal = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
-  // 2. HANDLE INPUT CHANGES
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // 3. HANDLE SUBMIT
   const handleSubmit = async () => {
     // Basic Validation
     if (!formData.fullName || !formData.phone) {
@@ -29,15 +27,44 @@ const JoinUsModal = ({ isOpen, onClose }) => {
 
     setIsSubmitting(true);
 
-    // Send to Firebase
-    const result = await joinMovement(formData);
+    try {
+        // --- 1. Send to Firebase ---
+        const result = await joinMovement(formData);
 
-    if (result.success) {
-        alert("Welcome to the movement! 🌍 We will contact you soon.");
-        setFormData({ fullName: '', phone: '', whatsapp: '' }); // Clear form
-        onClose(); // Close modal
-    } else {
-        alert("Something went wrong. Please check your connection.");
+        if (result.success) {
+            
+            // --- 2. Send Email Notification ---
+            // Prepare data for the template
+            const emailParams = {
+                user_name: formData.fullName,
+                user_phone: formData.phone,
+                user_whatsapp: formData.whatsapp || "Same as phone",
+                date: new Date().toLocaleDateString()
+            };
+
+            try {
+                await emailjs.send(
+                    import.meta.env.VITE_EMAILJS_SERVICE_ID,
+                    "template_u3crcsf", // <--- Paste your actual Template ID string here directly
+                    emailParams,
+                    import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+                );
+                console.log("✅ Volunteer Email Sent!");
+            } catch (emailError) {
+                console.error("❌ Volunteer Email Failed:", emailError);
+                // We don't alert the user here, because the database save was successful.
+            }
+
+            alert("Welcome to the movement! 🌍 We will contact you soon.");
+            setFormData({ fullName: '', phone: '', whatsapp: '' }); 
+            onClose(); 
+        } else {
+            alert("Something went wrong saving to database. Please check your connection.");
+        }
+
+    } catch (error) {
+        console.error("Critical Error:", error);
+        alert("An unexpected error occurred.");
     }
 
     setIsSubmitting(false);
@@ -46,22 +73,12 @@ const JoinUsModal = ({ isOpen, onClose }) => {
   return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
       
-      {/* --- INTERNAL STYLES FOR GUARANTEED ANIMATION --- */}
+      {/* --- ANIMATIONS --- */}
       <style>{`
-        @keyframes modalFadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes modalPopUp {
-          from { opacity: 0; transform: scale(0.95) translateY(20px); }
-          to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-        .animate-backdrop {
-          animation: modalFadeIn 0.3s ease-out forwards;
-        }
-        .animate-modal {
-          animation: modalPopUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
+        @keyframes modalFadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes modalPopUp { from { opacity: 0; transform: scale(0.95) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .animate-backdrop { animation: modalFadeIn 0.3s ease-out forwards; }
+        .animate-modal { animation: modalPopUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
       `}</style>
 
       {/* Backdrop */}
@@ -83,7 +100,6 @@ const JoinUsModal = ({ isOpen, onClose }) => {
 
         {/* Header Section */}
         <div className="bg-[#1a4032] p-8 text-center relative overflow-hidden">
-            {/* Decoration */}
             <div className="absolute top-[-50%] left-[-20%] w-48 h-48 bg-[#C3F53C]/20 rounded-full blur-3xl"></div>
             
             <div className="relative z-10">

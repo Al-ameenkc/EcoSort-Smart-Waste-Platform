@@ -1,15 +1,14 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import OpenAI from "openai";
 
-const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-const genAI = new GoogleGenerativeAI(apiKey);
+const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
 
-// NEW STRATEGY: Use the most stable, widely available models.
-// We removed the "2.0" and "Flash" models that were giving you errors.
-const MODEL_CANDIDATES = [
-  "gemini-pro",                 // The classic, most reliable model (v1.0)
-  "gemini-1.5-flash-latest",    // Try the "Latest" alias (sometimes works when specific versions fail)
-  "gemini-1.0-pro"              // Specific version of the classic model
-];
+// Initialize OpenAI
+// "dangerouslyAllowBrowser: true" is required because we are running this 
+// directly in React (Frontend) instead of a Backend server.
+const openai = new OpenAI({
+  apiKey: apiKey,
+  dangerouslyAllowBrowser: true 
+});
 
 const SYSTEM_INSTRUCTION = `
 You are Eco-AI, the official assistant for KanemWaste.
@@ -18,21 +17,21 @@ You are Eco-AI, the official assistant for KanemWaste.
 Help users recycle and use KanemWaste services.
 
 **BUTTON PROTOCOL (CRITICAL):**
-When a user wants to perform an action, you MUST provide a button using this EXACT markdown format:
-"[BUTTON: Button Text](action:action_code)"
+When a user wants to perform an action, you MUST provide a button using this EXACT markdown format (notice the hash #):
+"[BUTTON: Button Text](#action:action_code)"
 
 **SCENARIOS:**
 1. **User wants to Book a Pickup:**
    - Response: "You can schedule a waste pickup easily on our booking page."
-   - REQUIRED BUTTON: [BUTTON: Book a Pickup Now](action:book-pickup)
+   - REQUIRED BUTTON: [BUTTON: Book a Pickup Now](#action:book-pickup)
 
 2. **User wants to Scan Waste (Snap-Sort):**
    - Response: "I can open the AI Scanner for you right now."
-   - REQUIRED BUTTON: [BUTTON: Open AI Scanner](action:open-scanner)
+   - REQUIRED BUTTON: [BUTTON: Open AI Scanner](#action:open-scanner)
 
 3. **User asks "About Us":**
    - Response: "KanemWaste is dedicated to a cleaner future by empowering communities through smart recycling."
-   - REQUIRED BUTTON: [BUTTON: Read Our Full Story](action:about-us)
+   - REQUIRED BUTTON: [BUTTON: Read Our Full Story](#action:about-us)
 
 4. **Contact / Socials:**
    - WhatsApp: **[Chat on WhatsApp](https://wa.me/234000000000)**
@@ -43,68 +42,71 @@ When a user wants to perform an action, you MUST provide a button using this EXA
 - If asked about other topics, politely refuse.
 `;
 
-const fileToGenerativePart = async (imageUrl) => {
-  const response = await fetch(imageUrl);
+// Helper: Convert Image URL to Base64 (OpenAI needs the raw image data string)
+const imageUrlToBase64 = async (url) => {
+  const response = await fetch(url);
   const blob = await response.blob();
   return new Promise((resolve) => {
     const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64data = reader.result.split(',')[1];
-      resolve({ inlineData: { data: base64data, mimeType: blob.type } });
-    };
+    reader.onloadend = () => resolve(reader.result); 
     reader.readAsDataURL(blob);
   });
 };
 
 export const identifyWaste = async (imageUrl) => {
-  const imagePart = await fileToGenerativePart(imageUrl);
-  const prompt = `${SYSTEM_INSTRUCTION} \n Analyze this waste. JSON format only.`;
+  try {
+    const base64Image = await imageUrlToBase64(imageUrl);
+    
+    console.log("🤖 Asking OpenAI (gpt-4o-mini) to analyze image...");
+    
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini", // Cost-effective vision model
+      messages: [
+        {
+          role: "system",
+          content: `${SYSTEM_INSTRUCTION} \n\n TASK: Analyze this waste. Return ONLY valid JSON.`
+        },
+        {
+          role: "user",
+          content: [
+            { type: "text", text: "Identify this item. Return JSON: { \"itemName\": \"...\", \"isRecyclable\": true/false, \"confidence\": 0-100, \"reasoning\": \"...\", \"handlingTips\": [\"...\"] }" },
+            { type: "image_url", image_url: { url: base64Image } }
+          ]
+        }
+      ],
+      response_format: { type: "json_object" } // Forces OpenAI to give perfect JSON
+    });
 
-  for (const modelName of MODEL_CANDIDATES) {
-    try {
-      console.log(`🤖 Trying model: ${modelName}...`);
-      const model = genAI.getGenerativeModel({ model: modelName });
-      
-      // Note: gemini-pro (v1.0) sometimes doesn't support system instructions in the same way,
-      // so we include the instruction in the prompt itself to be safe.
-      const result = await model.generateContent([prompt, imagePart]);
-      const text = result.response.text();
-      
-      let cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
-      const firstBrace = cleanText.indexOf('{');
-      const lastBrace = cleanText.lastIndexOf('}');
-      if (firstBrace !== -1 && lastBrace !== -1) cleanText = cleanText.substring(firstBrace, lastBrace + 1);
-      
-      return JSON.parse(cleanText);
-    } catch (error) { 
-        console.warn(`❌ ${modelName} Failed:`, error.message);
-    }
+    const content = response.choices[0].message.content;
+    return JSON.parse(content);
+
+  } catch (error) {
+    console.error("OpenAI Error:", error);
+    throw new Error("Could not analyze image. Please check your internet or API key.");
   }
-  throw new Error("Could not identify image. Please try again later.");
 };
 
 export const chatAboutWaste = async (message, context) => {
+  try {
     const contextString = context.itemName 
-        ? `User is asking about: ${context.itemName}.` 
+        ? `User is currently looking at: ${context.itemName}.` 
         : "General recycling question.";
 
-    const finalPrompt = `
-      ${SYSTEM_INSTRUCTION}
-      CONTEXT: ${contextString}
-      QUESTION: "${message}"
-      Answer briefly. Use the BUTTON PROTOCOL if the user needs to navigate.
-    `;
+    console.log("🤖 Chatting with OpenAI (gpt-4o-mini)...");
 
-    for (const modelName of MODEL_CANDIDATES) {
-        try {
-            console.log(`🤖 Chatting with model: ${modelName}...`);
-            const model = genAI.getGenerativeModel({ model: modelName });
-            const result = await model.generateContent(finalPrompt);
-            return result.response.text();
-        } catch (error) { 
-            console.warn(`❌ ${modelName} Failed:`, error.message);
-            continue; 
-        }
-    }
-    return "I'm having trouble connecting right now. Please check your internet connection.";
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: SYSTEM_INSTRUCTION },
+        { role: "system", content: `CONTEXT: ${contextString}` },
+        { role: "user", content: message }
+      ]
+    });
+
+    return response.choices[0].message.content;
+
+  } catch (error) {
+    console.error("OpenAI Chat Error:", error);
+    return "I'm having trouble connecting to the server. Please check your internet connection.";
+  }
 };
