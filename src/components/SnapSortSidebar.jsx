@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { X, Bot, CheckCircle, AlertTriangle, Loader2, Send, RefreshCw, User } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { identifyWaste, chatAboutWaste } from '../services/aiService';
+import imageCompression from 'browser-image-compression'; // <--- 1. IMPORT THIS
 
 const SnapSortSidebar = ({ isOpen, onClose, image, onScanAgain }) => {
   const [currentImage, setCurrentImage] = useState(image);
@@ -35,6 +36,7 @@ const SnapSortSidebar = ({ isOpen, onClose, image, onScanAgain }) => {
   // --- MAIN ANALYSIS EFFECT ---
   useEffect(() => {
     if (isOpen && currentImage) {
+      // Prevent re-scanning the exact same image content
       if (hasScannedRef.current && lastImageRef.current === currentImage) return; 
 
       const runAnalysis = async () => {
@@ -59,12 +61,12 @@ const SnapSortSidebar = ({ isOpen, onClose, image, onScanAgain }) => {
           
         } catch (error) {
           console.error("Analysis failed:", error);
-          // Unlock on error
+          // Unlock on error so they can try again
           hasScannedRef.current = false;
           lastImageRef.current = null;
           
           // Show error bubble
-          setMessages(prev => [...prev, { role: 'error', text: "Connection failed. Please try again." }]);
+          setMessages(prev => [...prev, { role: 'error', text: "Could not analyze image. It might be too large or the server is busy." }]);
         } finally {
             setIsScanning(false);
         }
@@ -79,14 +81,36 @@ const SnapSortSidebar = ({ isOpen, onClose, image, onScanAgain }) => {
     if (fileInputRef.current) fileInputRef.current.click();
   };
 
-  const handleFileChange = (event) => {
+  // --- 2. UPDATED FILE HANDLER WITH COMPRESSION ---
+  const handleFileChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
-        const reader = new FileReader();
-        reader.onloadend = () => setCurrentImage(reader.result);
-        reader.readAsDataURL(file);
+        try {
+            // Compress the file BEFORE setting it to state
+            const options = {
+                maxSizeMB: 0.2,          // Compress to ~200KB
+                maxWidthOrHeight: 800,   // Resize to max 800px
+                useWebWorker: true,
+            };
+            
+            const compressedFile = await imageCompression(file, options);
+
+            // Convert Compressed file to Base64 to display and send
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setCurrentImage(reader.result); // This triggers the useEffect above
+            };
+            reader.readAsDataURL(compressedFile);
+
+        } catch (error) {
+            console.error("Compression Error:", error);
+            // Fallback: If compression fails, try the original file
+            const reader = new FileReader();
+            reader.onloadend = () => setCurrentImage(reader.result);
+            reader.readAsDataURL(file);
+        }
     }
-    event.target.value = '';
+    event.target.value = ''; // Reset input so same file can be selected again
   };
 
   const handleSend = async (e) => {

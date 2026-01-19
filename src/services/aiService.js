@@ -1,4 +1,3 @@
-
 const SYSTEM_INSTRUCTION = `
 You are Eco-AI, the official assistant for KanemWaste.
 
@@ -31,18 +30,29 @@ When a user wants to perform an action, you MUST provide a button using this EXA
 - If asked about other topics, politely refuse.
 `;
 
-// Helper: Convert Image to Base64 (Keep this)
-const imageUrlToBase64 = async (url) => {
-  const response = await fetch(url);
-  const blob = await response.blob();
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result); 
-    reader.readAsDataURL(blob);
-  });
+// --- HELPER: Handle Image Input Correctly ---
+const getBase64Image = async (input) => {
+  // 1. If it's already a Base64 string (starts with data:image...), just return it.
+  if (typeof input === 'string' && input.startsWith('data:image')) {
+    return input;
+  }
+
+  // 2. If it's a URL (http...), fetch and convert it
+  try {
+    const response = await fetch(input);
+    const blob = await response.blob();
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result); 
+      reader.readAsDataURL(blob);
+    });
+  } catch (e) {
+    console.error("Image conversion failed", e);
+    return null;
+  }
 };
 
-// --- NEW FUNCTION: Call Vercel API ---
+// --- API CALLER ---
 async function callMySecureAPI(messages, jsonMode = false) {
     try {
         const response = await fetch('/api/chat', {
@@ -55,19 +65,31 @@ async function callMySecureAPI(messages, jsonMode = false) {
             })
         });
 
+        // Check for 413 or other server errors explicitly
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`Server Error ${response.status}:`, errorText);
+            throw new Error(`Server responded with ${response.status}`);
+        }
+
         const data = await response.json();
         return data.content;
     } catch (error) {
-        console.error("API Error:", error);
-        throw new Error("Failed to connect to AI server.");
+        console.error("API Call Failed:", error);
+        throw error;
     }
 }
 
-export const identifyWaste = async (imageUrl) => {
+export const identifyWaste = async (imageInput) => {
   try {
-    const base64Image = await imageUrlToBase64(imageUrl);
+    // 1. Get clean Base64 string
+    const base64Image = await getBase64Image(imageInput);
     
-    // Construct the message payload
+    if (!base64Image) {
+        throw new Error("Invalid image data");
+    }
+
+    // 2. Construct the message payload
     const messages = [
         {
           role: "system",
@@ -87,7 +109,7 @@ export const identifyWaste = async (imageUrl) => {
 
   } catch (error) {
     console.error("Identify Error:", error);
-    throw new Error("Could not analyze image.");
+    throw new Error("Could not analyze image. Please try a smaller photo.");
   }
 };
 
