@@ -5,12 +5,13 @@ import Sidebar from '../components/admin/Sidebar';
 import PickupDetailModal from '../components/admin/PickupDetailModal';
 import { CheckCircle, Clock, MapPin, Package, Phone, Truck, Image as ImageIcon, ChevronLeft, ChevronRight, Filter, Users, MessageCircle, Heart } from 'lucide-react';
 
-const AdminDashboard = () => {
+// 1. ACCEPT THE onLogout PROP HERE
+const AdminDashboard = ({ onLogout }) => {
   const [activeTab, setActiveTab] = useState('pickups');
   
   // --- DATA STATES ---
   const [pickups, setPickups] = useState([]);
-  const [volunteers, setVolunteers] = useState([]); // <--- NEW STATE FOR VOLUNTEERS
+  const [volunteers, setVolunteers] = useState([]); 
   const [selectedPickup, setSelectedPickup] = useState(null);
   
   // --- FILTER & PAGINATION STATE ---
@@ -18,7 +19,7 @@ const AdminDashboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  // --- 1. REAL-TIME LISTENER FOR PICKUPS ---
+  // --- REAL-TIME LISTENER FOR PICKUPS ---
   useEffect(() => {
     const q = query(collection(db, "pickups"), orderBy("createdAt", "desc"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -27,9 +28,8 @@ const AdminDashboard = () => {
     return () => unsubscribe();
   }, []);
 
-  // --- 2. REAL-TIME LISTENER FOR VOLUNTEERS (NEW) ---
+  // --- REAL-TIME LISTENER FOR VOLUNTEERS ---
   useEffect(() => {
-    // We order by 'joinedAt' desc so newest volunteers show first
     const q = query(collection(db, "volunteers"), orderBy("joinedAt", "desc"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       setVolunteers(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
@@ -38,10 +38,10 @@ const AdminDashboard = () => {
   }, []);
 
 
-  // --- LOGIC: FILTERING (Pickups Only for now) ---
+  // --- LOGIC: FILTERING ---
   const filteredData = activeTab === 'pickups' 
     ? pickups.filter(p => filterStatus === 'All' || p.status === filterStatus)
-    : volunteers; // No filtering for volunteers yet
+    : volunteers; 
 
   // --- LOGIC: PAGINATION ---
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -58,13 +58,17 @@ const AdminDashboard = () => {
       setCurrentPage(1); 
   };
 
-  // Reset page when switching tabs
   useEffect(() => { setCurrentPage(1); }, [activeTab]);
 
   return (
     <div className="flex min-h-screen bg-slate-50 font-sans">
       
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+      {/* 2. PASS THE PROP TO SIDEBAR */}
+      <Sidebar 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab} 
+        onLogout={onLogout} 
+      />
 
       {/* Main Content */}
       <div className="flex-1 h-screen overflow-y-auto p-8 pt-32">
@@ -104,14 +108,12 @@ const AdminDashboard = () => {
         {/* --- PICKUPS VIEW --- */}
         {activeTab === 'pickups' && (
             <>
-                {/* Stats Row */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <StatCard icon={Clock} label="Pending" value={pickups.filter(p => p.status === 'Pending').length} color="blue" />
                     <StatCard icon={Truck} label="Assigned" value={pickups.filter(p => p.status === 'Assigned').length} color="orange" />
                     <StatCard icon={CheckCircle} label="Completed" value={pickups.filter(p => p.status === 'Completed').length} color="green" />
                 </div>
 
-                {/* Table Container */}
                 <div className="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden flex flex-col min-h-[500px]">
                     <div className="overflow-x-auto flex-1">
                         <table className="w-full text-left text-sm text-slate-600">
@@ -172,7 +174,7 @@ const AdminDashboard = () => {
             </>
         )}
 
-        {/* --- VOLUNTEERS VIEW (NEW) --- */}
+        {/* --- VOLUNTEERS VIEW --- */}
         {activeTab === 'volunteers' && (
             <div className="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden flex flex-col min-h-[500px]">
                  <div className="overflow-x-auto flex-1">

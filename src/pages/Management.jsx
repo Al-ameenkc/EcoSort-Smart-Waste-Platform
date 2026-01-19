@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import AdminDashboard from './AdminDashboard'; // Assuming your dashboard is here
+import AdminDashboard from './AdminDashboard'; 
 import { Lock, ShieldCheck, Loader2 } from 'lucide-react';
 
 const Management = () => {
@@ -8,7 +8,6 @@ const Management = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Check if user is already logged in (saved in browser)
   useEffect(() => {
     const session = sessionStorage.getItem('kanem_admin_session');
     if (session === 'true') {
@@ -21,12 +20,11 @@ const Management = () => {
     setIsLoading(true);
     setError('');
 
-    // Simulate a short delay for security feel
     setTimeout(() => {
-        // CHECK THE PASSWORD AGAINST .ENV VARIABLE
+        // Double check your .env file has VITE_ADMIN_PASSWORD=...
         if (password === import.meta.env.VITE_ADMIN_PASSWORD) {
             setIsAuthenticated(true);
-            sessionStorage.setItem('kanem_admin_session', 'true'); // Save session
+            sessionStorage.setItem('kanem_admin_session', 'true');
         } else {
             setError('Access Denied: Invalid Credentials');
         }
@@ -42,16 +40,8 @@ const Management = () => {
   // --- IF LOGGED IN: SHOW DASHBOARD ---
   if (isAuthenticated) {
     return (
-        <div className="relative">
-            {/* Logout Button Overlay */}
-            <button 
-                onClick={handleLogout}
-                className="fixed top-4 right-4 z-[60] bg-red-600 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-lg hover:bg-red-700 transition-colors"
-            >
-                Log Out
-            </button>
-            <AdminDashboard />
-        </div>
+        // 1. We pass the logout function DOWN to the dashboard
+        <AdminDashboard onLogout={handleLogout} />
     );
   }
 
