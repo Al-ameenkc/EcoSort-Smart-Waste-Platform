@@ -4,7 +4,8 @@ import PageWrapper from '../components/PageWrapper';
 import { db } from '../firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'; 
 import imageCompression from 'browser-image-compression';
-import emailjs from '@emailjs/browser'; // <--- 1. Import EmailJS
+import emailjs from '@emailjs/browser'; 
+import CustomAlert from '../components/CustomAlert'; // <--- 1. IMPORT CUSTOM ALERT
 
 // --- CUSTOM HELPER FOR BASE64 ---
 const convertToBase64 = (file) => {
@@ -86,6 +87,14 @@ const BookPickup = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCompressing, setIsCompressing] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
+
+  // --- 2. ALERT STATE ---
+  const [alertConfig, setAlertConfig] = useState({ 
+    isOpen: false, 
+    type: 'success', 
+    title: '', 
+    message: '' 
+  });
   
   const fileInputRef = useRef(null);
 
@@ -95,7 +104,8 @@ const BookPickup = () => {
   // --- UPDATED: HIGH ACCURACY LOCATION ---
   const handleLocateMe = () => {
     if (!navigator.geolocation) {
-        alert("Geolocation is not supported by your browser");
+        // Replaced alert
+        setAlertConfig({ isOpen: true, type: 'error', title: 'Error', message: 'Geolocation is not supported by your browser' });
         return;
     }
 
@@ -121,18 +131,21 @@ const BookPickup = () => {
                         address: data.display_name 
                     }));
                 } else {
-                    alert("Could not fetch address details.");
+                    // Replaced alert
+                    setAlertConfig({ isOpen: true, type: 'error', title: 'Location Error', message: 'Could not fetch address details.' });
                 }
             } catch (error) {
                 console.error("Geocoding error:", error);
-                alert("Failed to get address. Please type it manually.");
+                // Replaced alert
+                setAlertConfig({ isOpen: true, type: 'error', title: 'Connection Error', message: 'Failed to get address. Please type it manually.' });
             } finally {
                 setIsLocating(false);
             }
         },
         (error) => {
             console.error("Geolocation error:", error);
-            alert("Unable to retrieve location. Please check your GPS settings.");
+            // Replaced alert
+            setAlertConfig({ isOpen: true, type: 'error', title: 'Location Failed', message: 'Unable to retrieve location. Please check your GPS settings.' });
             setIsLocating(false);
         },
         options 
@@ -165,7 +178,13 @@ const BookPickup = () => {
     e.preventDefault();
     
     if(!formData.fullName || !formData.phone || !formData.address || !formData.wasteType) {
-        alert("Please fill in all required fields.");
+        // Replaced alert
+        setAlertConfig({ 
+            isOpen: true, 
+            type: 'error', 
+            title: 'Missing Details', 
+            message: 'Please fill in all required fields to proceed.' 
+        });
         return;
     }
 
@@ -178,19 +197,16 @@ const BookPickup = () => {
             imageUrl = await convertToBase64(imageFile);
         }
 
-        // 2. Prepare Data for Email
-        // We need to map your formData keys to the Template Variable names you set in EmailJS
         const emailParams = {
             user_name: formData.fullName,
             user_phone: formData.phone,
             user_address: formData.address + (formData.landmark ? ` (Landmark: ${formData.landmark})` : ''),
             waste_type: formData.wasteType,
-            bag_size: formData.bagSize || "Not specified", // <--- Added fallback text
+            bag_size: formData.bagSize || "Not specified",
             count: formData.count,
             pickup_date: new Date().toLocaleDateString()
         };
 
-        // 3. Send to Firebase (Keep this!)
         await addDoc(collection(db, "pickups"), {
             ...formData,
             imageUrl: imageUrl, 
@@ -198,17 +214,20 @@ const BookPickup = () => {
             createdAt: serverTimestamp()
         });
 
-        // 4. Send Email via EmailJS (New Addition!)
-        console.log("📨 Sending these params to EmailJS:", emailParams); 
-
         await emailjs.send(
             import.meta.env.VITE_EMAILJS_SERVICE_ID,
             import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-            emailParams, // <--- We send the params object, NOT the formRef
+            emailParams,
             import.meta.env.VITE_EMAILJS_PUBLIC_KEY
         );
 
-        alert("Request Submitted Successfully! 🚛 We have received your order.");
+        // --- 3. SHOW SUCCESS MODAL ---
+        setAlertConfig({ 
+            isOpen: true, 
+            type: 'success', 
+            title: 'Pickup Scheduled!', 
+            message: 'Our logistics team has received your request. We will contact you shortly.' 
+        });
         
         setFormData({ fullName: '', phone: '', address: '', landmark: '', wasteType: '', bagSize: '', count: 1 });
         setImageFile(null);
@@ -216,7 +235,13 @@ const BookPickup = () => {
 
     } catch (error) {
         console.error("Error submitting:", error);
-        alert("Submission failed. Please try again.");
+        // Replaced alert
+        setAlertConfig({ 
+            isOpen: true, 
+            type: 'error', 
+            title: 'Submission Failed', 
+            message: 'Something went wrong. Please check your internet connection and try again.' 
+        });
     }
 
     setIsSubmitting(false);
@@ -340,6 +365,16 @@ const BookPickup = () => {
 
           </div>
         </div>
+
+        {/* --- 4. RENDER CUSTOM ALERT --- */}
+        <CustomAlert 
+            isOpen={alertConfig.isOpen}
+            type={alertConfig.type}
+            title={alertConfig.title}
+            message={alertConfig.message}
+            onClose={() => setAlertConfig({ ...alertConfig, isOpen: false })}
+        />
+
       </div>
     </PageWrapper>
   );

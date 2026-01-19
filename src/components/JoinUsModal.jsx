@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { createPortal } from 'react-dom'; 
 import { X, User, Phone, MessageCircle, Heart, Loader2 } from 'lucide-react';
 import { joinMovement } from '../services/volunteerService'; 
-import emailjs from '@emailjs/browser'; // <--- 1. Import EmailJS
+import emailjs from '@emailjs/browser';
+import CustomAlert from './CustomAlert'; // <--- 1. Import CustomAlert
 
 const JoinUsModal = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
@@ -12,16 +13,38 @@ const JoinUsModal = ({ isOpen, onClose }) => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // --- 2. Alert State ---
+  const [alertConfig, setAlertConfig] = useState({ 
+    isOpen: false, 
+    type: 'success', 
+    title: '', 
+    message: '' 
+  });
+
   if (!isOpen) return null;
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // --- 3. Handle Alert Close ---
+  // If it was a success message, close the Modal when the user clicks "Continue"
+  const handleAlertClose = () => {
+    setAlertConfig(prev => ({ ...prev, isOpen: false }));
+    if (alertConfig.type === 'success') {
+        onClose(); // Close the JoinUsModal
+    }
+  };
+
   const handleSubmit = async () => {
     // Basic Validation
     if (!formData.fullName || !formData.phone) {
-        alert("Please enter your Name and Phone Number.");
+        setAlertConfig({
+            isOpen: true,
+            type: 'error',
+            title: 'Missing Information',
+            message: 'Please enter your Name and Phone Number to join.'
+        });
         return;
     }
 
@@ -34,7 +57,6 @@ const JoinUsModal = ({ isOpen, onClose }) => {
         if (result.success) {
             
             // --- 2. Send Email Notification ---
-            // Prepare data for the template
             const emailParams = {
                 user_name: formData.fullName,
                 user_phone: formData.phone,
@@ -45,33 +67,44 @@ const JoinUsModal = ({ isOpen, onClose }) => {
             try {
                 await emailjs.send(
                     import.meta.env.VITE_EMAILJS_SERVICE_ID,
-                    "template_u3crcsf", // <--- Paste your actual Template ID string here directly
+                    import.meta.env.VITE_EMAILJS_VOLUNTEER_TEMPLATE_ID, // Use the Env Variable
                     emailParams,
                     import.meta.env.VITE_EMAILJS_PUBLIC_KEY
                 );
                 console.log("✅ Volunteer Email Sent!");
             } catch (emailError) {
                 console.error("❌ Volunteer Email Failed:", emailError);
-                // We don't alert the user here, because the database save was successful.
             }
 
-            alert("Welcome to the movement! 🌍 We will contact you soon.");
+            // --- 3. Show Success Alert ---
             setFormData({ fullName: '', phone: '', whatsapp: '' }); 
-            onClose(); 
+            setAlertConfig({
+                isOpen: true,
+                type: 'success',
+                title: 'Welcome to the Movement!',
+                message: 'Your application is received. We will contact you via WhatsApp shortly.'
+            });
+            // Note: We don't call onClose() here. We wait for the user to close the Alert.
+
         } else {
-            alert("Something went wrong saving to database. Please check your connection.");
+            throw new Error("Database save failed");
         }
 
     } catch (error) {
         console.error("Critical Error:", error);
-        alert("An unexpected error occurred.");
+        setAlertConfig({
+            isOpen: true,
+            type: 'error',
+            title: 'Submission Failed',
+            message: 'Please check your internet connection and try again.'
+        });
     }
 
     setIsSubmitting(false);
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
+    <div className="fixed inset-0 z-[90] flex items-center justify-center px-4">
       
       {/* --- ANIMATIONS --- */}
       <style>{`
@@ -178,6 +211,15 @@ const JoinUsModal = ({ isOpen, onClose }) => {
             </button>
 
         </div>
+
+        {/* --- 4. Render Custom Alert Inside Modal --- */}
+        <CustomAlert 
+            isOpen={alertConfig.isOpen}
+            type={alertConfig.type}
+            title={alertConfig.title}
+            message={alertConfig.message}
+            onClose={handleAlertClose} // Use the smart handler
+        />
 
       </div>
     </div>,
