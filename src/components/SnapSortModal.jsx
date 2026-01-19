@@ -1,17 +1,53 @@
 import React, { useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Upload, ScanLine } from 'lucide-react';
+import { X, Upload, ScanLine, Loader2 } from 'lucide-react'; // Added Loader2
+import imageCompression from 'browser-image-compression'; // <--- 1. IMPORT THIS
 
 const SnapSortModal = ({ isOpen, onClose, onImageSelect }) => {
   const fileInputRef = useRef(null);
+  const [isCompressing, setIsCompressing] = React.useState(false); // Add state for loading
 
   if (!isOpen) return null;
 
-  const handleFileChange = (e) => {
+  // --- 2. UPDATED FILE HANDLER ---
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      onImageSelect(imageUrl);
+      setIsCompressing(true); // Start loading UI
+      
+      try {
+        console.log("Original size:", file.size / 1024 / 1024, "MB");
+
+        // Compression Options
+        const options = {
+          maxSizeMB: 0.2,          // Compress to ~200KB
+          maxWidthOrHeight: 800,   // Resize to max 800px
+          useWebWorker: true,
+        };
+
+        const compressedFile = await imageCompression(file, options);
+        console.log("Compressed size:", compressedFile.size / 1024 / 1024, "MB");
+
+        // Convert to Base64 to pass to parent
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          onImageSelect(reader.result); // Pass the SAFE, compressed image
+          setIsCompressing(false); // Stop loading
+          onClose(); // Close modal immediately after selection
+        };
+        reader.readAsDataURL(compressedFile);
+
+      } catch (error) {
+        console.error("Compression failed:", error);
+        // Fallback: Send original if compression fails
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            onImageSelect(reader.result);
+            setIsCompressing(false);
+            onClose();
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 
@@ -93,14 +129,19 @@ const SnapSortModal = ({ isOpen, onClose, onImageSelect }) => {
             
             <button 
                 onClick={triggerInput}
-                className="w-full flex items-center gap-4 p-4 rounded-2xl bg-[#1a4032] hover:bg-[#143328] text-white transition-all shadow-lg hover:shadow-xl group text-left"
+                disabled={isCompressing} // Disable while processing
+                className="w-full flex items-center gap-4 p-4 rounded-2xl bg-[#1a4032] hover:bg-[#143328] text-white transition-all shadow-lg hover:shadow-xl group text-left disabled:opacity-70 disabled:cursor-wait"
             >
                 <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-[#C3F53C]">
-                    <Upload size={24} />
+                    {isCompressing ? <Loader2 className="animate-spin" size={24} /> : <Upload size={24} />}
                 </div>
                 <div>
-                    <h4 className="font-bold text-white text-lg">Upload a Picture</h4>
-                    <p className="text-xs text-slate-300">Select from gallery or use camera</p>
+                    <h4 className="font-bold text-white text-lg">
+                        {isCompressing ? "Processing Image..." : "Upload a Picture"}
+                    </h4>
+                    <p className="text-xs text-slate-300">
+                        {isCompressing ? "Optimizing for AI..." : "Select from gallery or use camera"}
+                    </p>
                 </div>
             </button>
 
