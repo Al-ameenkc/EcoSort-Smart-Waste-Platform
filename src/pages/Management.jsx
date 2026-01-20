@@ -20,31 +20,18 @@ const Management = () => {
     setIsLoading(true);
     setError('');
 
-    // --- TEMPORARY DEBUGGING LOGS (View in Browser Console) ---
-    const envValue = import.meta.env.VITE_ADMIN_PASSWORD;
-    console.log("---------------- DEBUG START ----------------");
-    console.log("Input Password:", `"${password}"`); // Quote to see spaces
-    console.log("Env Value:", `"${envValue}"`);       // Quote to see spaces
-    console.log("Env Type:", typeof envValue);
-    console.log("Env Length:", (envValue || "").length);
-    console.log("---------------- DEBUG END ------------------");
-
     setTimeout(() => {
-        // 1. Get Environment Variable & User Input
         const rawEnvPass = import.meta.env.VITE_ADMIN_PASSWORD;
-        
-        // 2. Safe Trim (Handles undefined/null gracefully)
         const envPass = (rawEnvPass || "").trim();
         const inputPass = (password || "").trim();
 
-        // 3. Compare
         if (inputPass && inputPass === envPass) {
             setIsAuthenticated(true);
             sessionStorage.setItem('kanem_admin_session', 'true');
+            setPassword(''); // <--- 1. CLEAR PASSWORD ON SUCCESS
         } else {
-            // Specific error if Env is missing entirely
             if (!envPass) {
-                console.error("CRITICAL: VITE_ADMIN_PASSWORD is missing or empty!");
+                console.error("CRITICAL: VITE_ADMIN_PASSWORD is missing!");
                 setError('System Error: Configuration Missing');
             } else {
                 setError('Access Denied: Invalid Credentials');
@@ -57,6 +44,7 @@ const Management = () => {
   const handleLogout = () => {
     sessionStorage.removeItem('kanem_admin_session');
     setIsAuthenticated(false);
+    setPassword(''); // <--- 2. CLEAR PASSWORD ON LOGOUT
   };
 
   // --- IF LOGGED IN: SHOW DASHBOARD ---
