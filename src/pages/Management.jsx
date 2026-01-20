@@ -20,13 +20,35 @@ const Management = () => {
     setIsLoading(true);
     setError('');
 
+    // --- TEMPORARY DEBUGGING LOGS (View in Browser Console) ---
+    const envValue = import.meta.env.VITE_ADMIN_PASSWORD;
+    console.log("---------------- DEBUG START ----------------");
+    console.log("Input Password:", `"${password}"`); // Quote to see spaces
+    console.log("Env Value:", `"${envValue}"`);       // Quote to see spaces
+    console.log("Env Type:", typeof envValue);
+    console.log("Env Length:", (envValue || "").length);
+    console.log("---------------- DEBUG END ------------------");
+
     setTimeout(() => {
-        // Double check your .env file has VITE_ADMIN_PASSWORD=...
-        if (password === import.meta.env.VITE_ADMIN_PASSWORD) {
+        // 1. Get Environment Variable & User Input
+        const rawEnvPass = import.meta.env.VITE_ADMIN_PASSWORD;
+        
+        // 2. Safe Trim (Handles undefined/null gracefully)
+        const envPass = (rawEnvPass || "").trim();
+        const inputPass = (password || "").trim();
+
+        // 3. Compare
+        if (inputPass && inputPass === envPass) {
             setIsAuthenticated(true);
             sessionStorage.setItem('kanem_admin_session', 'true');
         } else {
-            setError('Access Denied: Invalid Credentials');
+            // Specific error if Env is missing entirely
+            if (!envPass) {
+                console.error("CRITICAL: VITE_ADMIN_PASSWORD is missing or empty!");
+                setError('System Error: Configuration Missing');
+            } else {
+                setError('Access Denied: Invalid Credentials');
+            }
         }
         setIsLoading(false);
     }, 800);
@@ -39,10 +61,7 @@ const Management = () => {
 
   // --- IF LOGGED IN: SHOW DASHBOARD ---
   if (isAuthenticated) {
-    return (
-        // 1. We pass the logout function DOWN to the dashboard
-        <AdminDashboard onLogout={handleLogout} />
-    );
+    return <AdminDashboard onLogout={handleLogout} />;
   }
 
   // --- IF NOT LOGGED IN: SHOW LOCK SCREEN ---
