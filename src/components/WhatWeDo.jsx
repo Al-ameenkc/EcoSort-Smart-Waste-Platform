@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+// --- 1. IMPORT YOUR IMAGES HERE ---
 import educationImg from '../assets/education.png'; 
 import innovationImg from '../assets/innovation.png'; 
+import greenLogisticsImg from '../assets/green-logistics.jpg'; // <--- NEW IMPORT
 
 const projects = [
   {
@@ -41,10 +43,10 @@ const projects = [
   },
   {
     id: 3,
-    title: "Smart R&D",
-    badge: "R & D",
-    desc: "Researching efficient ways to turn waste into economic value.",
-    img: "https://images.unsplash.com/photo-1581093458891-2f9cd526332e?q=80&w=2070&auto=format&fit=crop",
+    title: "Smart Logistics", 
+    badge: "Technology",      
+    desc: "AI-driven route optimization to minimize carbon emissions and costs.", 
+    img: greenLogisticsImg, // <--- 2. USED HERE
     bg: "bg-[#C3F53C]",
     text: "text-slate-900",
     border: "",
@@ -126,7 +128,7 @@ const WhatWeDo = () => {
                 </>
               )}
               {isActive && (
-                 <div className={`absolute top-[-50%] left-[-20%] w-[80%] h-[150%] rounded-full blur-3xl pointer-events-none opacity-50 ${project.blobColor}`}></div>
+                  <div className={`absolute top-[-50%] left-[-20%] w-[80%] h-[150%] rounded-full blur-3xl pointer-events-none opacity-50 ${project.blobColor}`}></div>
               )}
 
               {/* --- CONTENT CONTAINER --- */}

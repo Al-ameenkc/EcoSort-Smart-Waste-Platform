@@ -21,10 +21,10 @@ const OurStory = () => {
                 </h2>
                 <div className="space-y-4 text-slate-300 text-base md:text-lg leading-relaxed">
                     <p>
-                        KanemWaste began with a simple observation: our streets were cluttered, but our community had energy. Founded in 2024, we set out to bridge the gap between waste and wealth.
+                        KanemWaste began with a simple observation: our streets were cluttered, but our community had untapped energy. <strong className="text-white">Born from a passion for sustainability</strong>, we set out to bridge the gap between waste and wealth.
                     </p>
                     <p>
-                        What started as a small team with one truck has grown into a tech-enabled logistics network. We don't just pick up trash; we analyze data, optimize routes, and educate the next generation of eco-warriors.
+                        What started as a grassroots team has evolved into a <strong className="text-white">tech-enabled logistics network</strong>. We don't just pick up trash; we use AI to analyze waste patterns, algorithms to optimize routes, and education to empower the next generation of eco-warriors.
                     </p>
                 </div>
                 
@@ -37,9 +37,8 @@ const OurStory = () => {
             {/* --- RIGHT: VISUAL GRID --- */}
             <div className="grid grid-cols-2 gap-4">
                 {/* Column 1: Image Top, Card Bottom */}
-                {/* Reduced translate-y to 8 to keep it compact */}
                 <div className="space-y-4 translate-y-8">
-                    {/* Image: h-60 (Tall but fits) */}
+                    {/* Image: h-60 */}
                     <div className="h-60 rounded-[2rem] overflow-hidden shadow-lg">
                         <img 
                             src="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?q=80&w=2070&auto=format&fit=crop" 
@@ -47,7 +46,7 @@ const OurStory = () => {
                             alt="Collection"
                         />
                     </div>
-                    {/* Card: h-44 (Smaller than image) */}
+                    {/* Card: h-44 */}
                     <div className="h-44 bg-[#C3F53C] rounded-[2rem] p-6 flex flex-col justify-end text-[#1a4032] shadow-lg">
                         <Target size={28} className="mb-2" />
                         <span className="font-bold text-lg leading-tight">Zero Waste <br/> Goal</span>

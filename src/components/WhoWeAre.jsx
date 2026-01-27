@@ -1,7 +1,7 @@
 import React from 'react';
 import { Star } from 'lucide-react';
 
-// Make sure your image is in src/assets/ and named who-we-are.jpg (or update this line)
+// Make sure your image is in src/assets/ and named who-we-are.jpg
 import whoWeAreImg from '../assets/who-we-are.jpg'; 
 
 const WhoWeAre = () => {
@@ -39,14 +39,18 @@ const WhoWeAre = () => {
             </p>
 
             <div className="flex items-center gap-8">
+                {/* STAT 1: AI LOGIC */}
                 <div className="flex flex-col">
-                    <span className="text-3xl font-bold text-[#1a4032]">98%</span>
-                    <span className="text-xs text-slate-500 font-medium">Recycle Rate</span>
+                    <span className="text-3xl font-bold text-[#1a4032]">95%</span>
+                    <span className="text-xs text-slate-500 font-medium">AI Precision</span>
                 </div>
+                
                 <div className="w-px h-10 bg-slate-200"></div>
+                
+                {/* STAT 2: LOGISTICS IMPACT - UPDATED TO 25% */}
                 <div className="flex flex-col">
-                    <span className="text-3xl font-bold text-[#1a4032]">50+</span>
-                    <span className="text-xs text-slate-500 font-medium">Partners</span>
+                    <span className="text-3xl font-bold text-[#1a4032]">25%</span>
+                    <span className="text-xs text-slate-500 font-medium">CO₂ Reduced</span>
                 </div>
             </div>
         </div>
@@ -69,7 +73,6 @@ const WhoWeAre = () => {
                             <Star key={i} size={12} fill="#FACC15" className="text-yellow-400" />
                         ))}
                     </div>
-                    {/* UPDATED TEXT HERE */}
                     <p className="text-slate-900 font-bold text-sm leading-tight">
                         "Leading the change for sustainability."
                     </p>

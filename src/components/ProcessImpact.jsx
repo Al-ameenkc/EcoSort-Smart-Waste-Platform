@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'; 
 // 1. IMPORT THE LOCAL IMAGE
 import impactImg from '../assets/impact.jpg';
 
@@ -72,16 +72,13 @@ const ProcessImpact = () => {
             {/* Reduced spacing: space-y-3 -> space-y-2 */}
             <ul className="space-y-2 mb-6 text-left list-disc pl-5 marker:text-green-500">
                 <li className="text-sm text-slate-600">
-                    Recycled over millions of tons of plastic waste.
+                    Recycled hundreds of tons of plastic waste.
                 </li>
                 <li className="text-sm text-slate-600">
-                    Reduced carbon emissions by 1,000 metric tons.
+                    Reduced carbon emissions by 25%.
                 </li>
                 <li className="text-sm text-slate-600">
-                    Created 500+ jobs in local communities.
-                </li>
-                <li className="text-sm text-slate-600">
-                    Educated thousands of individuals about the importance of recycling.
+                    Educated individuals about the importance of recycling.
                 </li>
             </ul>
 

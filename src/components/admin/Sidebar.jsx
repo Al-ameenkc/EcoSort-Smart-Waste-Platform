@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
-import { LayoutDashboard, Users, ChevronLeft, ChevronRight, LogOut } from 'lucide-react';
+// 1. IMPORT Navigation ICON
+import { LayoutDashboard, Users, ChevronLeft, ChevronRight, LogOut, Navigation } from 'lucide-react';
 import logo from '../../assets/kanem-logo.png'; 
 
-// 1. Accept 'onLogout' as a prop
 const Sidebar = ({ activeTab, setActiveTab, onLogout }) => {
   const [collapsed, setCollapsed] = useState(false);
 
+  // 2. ADD THE OPTIMIZER TO THIS LIST
   const menuItems = [
     { id: 'pickups', label: 'Pickups', icon: LayoutDashboard },
     { id: 'volunteers', label: 'Volunteers', icon: Users },
+    { id: 'optimizer', label: 'Route Optimizer', icon: Navigation }, // <--- NEW ITEM
   ];
 
   return (
@@ -61,7 +63,7 @@ const Sidebar = ({ activeTab, setActiveTab, onLogout }) => {
       {/* FOOTER - LOGOUT BUTTON */}
       <div className="p-4 border-t border-white/10">
         <button 
-            onClick={onLogout} // 2. Connect the click to the prop
+            onClick={onLogout} 
             className={`w-full flex items-center gap-3 px-4 py-3 text-red-300 hover:bg-red-500/10 hover:text-red-200 rounded-xl transition-colors ${collapsed ? 'justify-center' : ''}`}
         >
             <LogOut size={20} />
