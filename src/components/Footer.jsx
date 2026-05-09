@@ -23,14 +23,14 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-white border-t border-slate-100 pt-16 pb-10 px-6">
+    <footer className="bg-white border-t border-slate-100 pt-14 md:pt-16 pb-10 px-4 sm:px-6">
       <div className="max-w-[1400px] mx-auto">
         
         {/* --- GRID LAYOUT --- */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-12 mb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 md:gap-x-8 gap-y-10 md:gap-y-12 mb-14 md:mb-16">
             
             {/* COLUMN 1: BRAND */}
-            <div className="col-span-2 md:col-span-1">
+            <div className="col-span-1">
                 <Link to="/" onClick={handleScrollTop} className="flex items-center gap-2 mb-6 group w-fit">
                     <img src={logo} alt="KanemWaste" className="h-8 w-auto group-hover:scale-105 transition-transform" />
                     <span className="text-lg font-semibold tracking-tight text-slate-900">KanemWaste</span>
@@ -77,7 +77,7 @@ const Footer = () => {
             </div>
 
             {/* COLUMN 4: NEWSLETTER */}
-            <div className="col-span-2 md:col-span-1">
+            <div className="col-span-1">
                 <h4 className="font-bold text-slate-900 mb-6">Stay Updated</h4>
                 <p className="text-slate-500 text-sm mb-4">Subscribe to our newsletter for the latest eco-tips.</p>
                 <form className="flex gap-2" onSubmit={(e) => e.preventDefault()}>
@@ -95,11 +95,11 @@ const Footer = () => {
         </div>
 
         {/* --- BOTTOM SECTION: COPYRIGHT --- */}
-        <div className="border-t border-slate-100 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-slate-400 text-sm">
+        <div className="border-t border-slate-100 pt-6 md:pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-slate-400 text-xs sm:text-sm text-center md:text-left">
                 © 2026 KanemWaste. All rights reserved.
             </p>
-            <div className="flex gap-8 text-sm text-slate-400">
+            <div className="flex gap-5 sm:gap-8 text-xs sm:text-sm text-slate-400">
                 <Link to="/terms" onClick={handleScrollTop} className="hover:text-slate-900 transition-colors">Terms</Link>
                 <Link to="/privacy" onClick={handleScrollTop} className="hover:text-slate-900 transition-colors">Privacy</Link>
                 <Link to="/cookies" onClick={handleScrollTop} className="hover:text-slate-900 transition-colors">Cookies</Link>

@@ -310,16 +310,16 @@ const RouteOptimizer = ({ pickups = [] }) => {
   const getShortName = (name) => name.length > 20 ? name.substring(0, 20) + "..." : name;
 
   return (
-    <div className="h-full flex flex-col gap-6">
+    <div className="h-full flex flex-col gap-4 lg:gap-6">
       
       {/* VISUAL SEQUENCE BAR */}
       {visualSequence.length > 0 && (
-        <div className="bg-white p-6 rounded-2xl shadow-md border border-slate-200 animate-in slide-in-from-top-4">
-             <div className="flex justify-between items-center mb-4">
-                 <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+        <div className="bg-white p-4 md:p-6 rounded-2xl shadow-md border border-slate-200 animate-in slide-in-from-top-4">
+             <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-4 gap-2">
+                 <h3 className="text-base md:text-lg font-bold text-slate-800 flex items-center gap-2">
                     <Truck className="text-green-600" /> Route Overview
                  </h3>
-                 <span className="bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                 <span className="w-fit bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
                     {totalDist} KM Total
                  </span>
              </div>
@@ -342,7 +342,7 @@ const RouteOptimizer = ({ pickups = [] }) => {
                                         {step.type === 'start' ? 'Start' : step.type === 'target' ? 'End' : 'Area'}
                                     </span>
                                 </div>
-                                <span className="font-bold text-lg">{step.label}</span>
+                                <span className="font-bold text-base md:text-lg">{step.label}</span>
                             </div>
                         </React.Fragment>
                     ))}
@@ -352,9 +352,9 @@ const RouteOptimizer = ({ pickups = [] }) => {
       )}
 
       {/* CONTROLS */}
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-        <div className="md:col-span-1">
-            <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+      <div className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-slate-100 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 items-end">
+        <div className="sm:col-span-2 xl:col-span-1">
+            <h2 className="text-lg md:text-xl font-bold text-slate-800 flex items-center gap-2">
                 <Navigation className="text-green-600" /> Granular AI
             </h2>
             <p className="text-xs text-slate-500">Stop-by-stop optimization.</p>
@@ -381,15 +381,15 @@ const RouteOptimizer = ({ pickups = [] }) => {
         <button 
             onClick={runOptimization}
             disabled={isOptimizing}
-            className="bg-[#1a4032] hover:bg-green-800 text-white px-4 py-2.5 rounded-xl font-bold shadow-lg shadow-green-900/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50 h-[42px]"
+            className="sm:col-span-2 xl:col-span-1 bg-[#1a4032] hover:bg-green-800 text-white px-4 py-2.5 rounded-xl font-bold shadow-lg shadow-green-900/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50 h-[42px]"
         >
             {isOptimizing ? 'Calculating...' : 'Calculate Optimal Path'}
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[500px]">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 lg:gap-6">
         {/* Sequence List */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-0 overflow-hidden flex flex-col">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-0 overflow-hidden flex flex-col min-h-[360px] max-h-[500px] xl:max-h-[580px]">
             <div className="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
                 <h3 className="font-bold text-slate-700">Detailed Stops</h3>
             </div>
@@ -428,7 +428,7 @@ const RouteOptimizer = ({ pickups = [] }) => {
         </div>
 
         {/* Map */}
-        <div className="lg:col-span-2 bg-slate-100 rounded-2xl overflow-hidden shadow-inner border border-slate-200 relative z-0">
+        <div className="xl:col-span-2 bg-slate-100 rounded-2xl overflow-hidden shadow-inner border border-slate-200 relative z-0 h-[320px] sm:h-[420px] xl:h-auto xl:min-h-[500px]">
           <MapContainer center={ANCHORS['Wuse']} zoom={12} style={{ height: '100%', width: '100%' }}>
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='© OpenStreetMap' />
             {routeStep.map((step, index) => (

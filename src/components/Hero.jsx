@@ -113,7 +113,7 @@ const Hero = () => {
         
         {/* --- MOBILE ICONS ROW (Visible only on Mobile) --- */}
         {/* Added h-24 and items-center to contain the large scaling without layout shifts */}
-        <div className="flex md:hidden gap-6 mb-8 justify-center w-full items-center h-24 px-4">
+        <div className="flex lg:hidden gap-4 sm:gap-6 mb-8 justify-center w-full items-center h-24 px-2 sm:px-4">
             <button 
                 onClick={() => handleManualSlide(0)}
                 // UPDATED CLASSNAMES: Added scale-125/scale-90, opacity, and stronger rings
@@ -144,10 +144,10 @@ const Hero = () => {
 
 
         {/* ROW 1: Desktop Icons -- Headline -- Desktop Icons */}
-        <div className="w-full flex justify-between items-center mb-12">
+        <div className="w-full flex justify-between items-center mb-10 lg:mb-12">
             
             {/* --- LEFT ICONS CLUSTER (Desktop Only) --- */}
-            <div className="hidden md:flex flex-col items-start">
+            <div className="hidden lg:flex flex-col items-start">
                 <button 
                     onClick={() => handleManualSlide(0)}
                     className={`w-14 h-14 rounded-full flex items-center justify-center shadow-sm z-10 transition-all duration-500 ${activeSlide === 0 ? 'bg-[#E8F89C] scale-125 ring-4 ring-[#E8F89C]/30' : 'bg-gray-100 hover:bg-[#E8F89C] hover:scale-110'}`}
@@ -163,11 +163,11 @@ const Hero = () => {
             </div>
 
             {/* --- CENTER HEADLINE (TYPEWRITER) --- */}
-            <div className="min-h-[160px] flex items-center">
-                <h1 className="text-5xl md:text-7xl font-medium text-center tracking-tight text-slate-900 max-w-5xl mx-auto leading-[1.15]">
+            <div className="min-h-[140px] sm:min-h-[160px] flex items-center">
+                <h1 className="text-4xl sm:text-5xl lg:text-7xl font-medium text-center tracking-tight text-slate-900 max-w-5xl mx-auto leading-[1.15]">
                 
                 {renderStart} 
-                <br className="hidden md:block" />
+                <br className="hidden lg:block" />
 
                 {renderHighlight.length > 0 && (
                     <span className="relative inline-block px-4 mx-1 z-10">
@@ -184,7 +184,7 @@ const Hero = () => {
             </div>
 
             {/* --- RIGHT ICONS CLUSTER (Desktop Only) --- */}
-            <div className="hidden md:flex flex-col items-end">
+            <div className="hidden lg:flex flex-col items-end">
                 <button 
                     onClick={() => handleManualSlide(2)}
                     className={`w-14 h-14 rounded-full flex items-center justify-center shadow-sm z-10 transition-all duration-500 ${activeSlide === 2 ? 'bg-[#F1FCC2] scale-125 ring-4 ring-[#F1FCC2]/30' : 'bg-gray-100 hover:bg-[#F1FCC2] hover:scale-110'}`}
@@ -202,18 +202,18 @@ const Hero = () => {
         </div>
 
         {/* ROW 2: Description -- Buttons */}
-        <div className="w-full flex flex-col md:flex-row items-center justify-between gap-10">
-            <div className="md:w-1/3 pl-4">
-                <p className="text-gray-500 text-lg text-center md:text-left leading-relaxed max-w-xs mx-auto md:mx-0">
+        <div className="w-full flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-10">
+            <div className="lg:w-1/3 lg:pl-4">
+                <p className="text-gray-500 text-base sm:text-lg text-center lg:text-left leading-relaxed max-w-xs mx-auto lg:mx-0">
                   We are an organization that educates society about the problems of ecology and nature using AI technology.
                 </p>
             </div>
 
-            <div className="md:w-auto flex flex-col sm:flex-row items-center gap-4 pr-4">
+            <div className="lg:w-auto flex flex-col sm:flex-row items-center gap-3 sm:gap-4 lg:pr-4">
                  {/* BUTTON 1: START EARNING (Links to /book-pickup) */}
                  <Link 
                     to="/book-pickup"
-                    className="bg-[#C3F53C] hover:bg-[#b2e32b] text-black transition-all px-8 py-4 rounded-full flex items-center gap-3 font-semibold text-lg shadow-xl shadow-lime-200/50 hover:scale-105 hover:shadow-lime-200/80 group"
+                    className="bg-[#C3F53C] hover:bg-[#b2e32b] text-black transition-all px-6 sm:px-8 py-3.5 sm:py-4 rounded-full flex items-center gap-2.5 sm:gap-3 font-semibold text-base sm:text-lg shadow-xl shadow-lime-200/50 hover:scale-105 hover:shadow-lime-200/80 group"
                  >
                     Start Earning <ArrowUpRight size={22} className="group-hover:rotate-45 transition-transform" />
                  </Link>
@@ -221,7 +221,7 @@ const Hero = () => {
                  {/* BUTTON 2: JOIN US (Opens Modal) */}
                  <button 
                     onClick={() => setIsJoinModalOpen(true)}
-                    className="bg-white border border-slate-200 text-slate-900 hover:bg-slate-50 transition-all px-8 py-4 rounded-full flex items-center gap-3 font-semibold text-lg hover:scale-105"
+                    className="bg-white border border-slate-200 text-slate-900 hover:bg-slate-50 transition-all px-6 sm:px-8 py-3.5 sm:py-4 rounded-full flex items-center gap-2.5 sm:gap-3 font-semibold text-base sm:text-lg hover:scale-105"
                  >
                     <Heart size={20} className="text-[#C3F53C]" fill="currentColor" />
                     Join Us

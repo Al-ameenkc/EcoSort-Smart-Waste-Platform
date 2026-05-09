@@ -92,7 +92,7 @@ const Navbar = () => {
   return (
     <>
       <nav className="fixed top-0 w-full z-50 bg-white/20 backdrop-blur-sm border-b border-white/20 shadow-sm transition-all duration-300">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between relative">
           
           {/* LOGO LINK */}
           <Link to="/" className="flex items-center gap-3 z-[60]" onClick={closeMobileMenu}>
@@ -101,13 +101,13 @@ const Navbar = () => {
                 alt="Kanem Waste Logo" 
                 className={getLogoStyle()} 
             />
-            <span className={`hidden md:block text-xl font-light tracking-tight text-primary ${getContentStyle()}`}>
+            <span className={`hidden lg:block text-xl font-light tracking-tight text-primary ${getContentStyle()}`}>
                 KanemWaste
             </span>
           </Link>
 
           {/* DESKTOP MENU */}
-          <div className={`hidden md:flex items-center gap-3 ${getContentStyle()}`}>
+          <div className={`hidden xl:flex items-center gap-2 ${getContentStyle()}`}>
             <Link to="/">
               <NavPill icon={<HomeIcon size={16} className="text-black"/>} text="Home" active={location.pathname === '/'} />
             </Link>
@@ -147,8 +147,8 @@ const Navbar = () => {
           </div>
 
           {/* CONTACT & MOBILE MENU */}
-          <div className={`flex items-center gap-3 ${getContentStyle()}`}>
-              <div className="hidden md:block">
+          <div className={`flex items-center gap-2 sm:gap-3 ${getContentStyle()}`}>
+              <div className="hidden xl:block">
                 <ContactUs />
               </div>
               <HamburglarMenu 

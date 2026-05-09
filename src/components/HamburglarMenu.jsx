@@ -2,7 +2,7 @@ import React from 'react';
 
 const HamburglarMenu = ({ isOpen, onClick }) => {
   return (
-    <div onClick={onClick} className="cursor-pointer md:hidden relative z-[60]" style={{ transform: 'scale(0.7)' }}>
+    <div onClick={onClick} className="cursor-pointer xl:hidden relative z-[60]" style={{ transform: 'scale(0.7)' }}>
       
       {/* INTERNAL CSS FOR THE ANIMATION */}
       <style>{`

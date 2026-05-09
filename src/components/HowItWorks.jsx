@@ -3,24 +3,24 @@ import { Truck, Recycle, Trash2, ArrowRight, CalendarCheck } from 'lucide-react'
 
 const HowItWorks = () => {
   return (
-    <section className="py-24 px-6 max-w-[1400px] mx-auto">
+    <section className="py-16 md:py-20 lg:py-24 px-4 sm:px-6 max-w-[1400px] mx-auto">
       
       {/* --- SECTION HEADER --- */}
-      <div className="text-center mb-16">
+      <div className="text-center mb-10 md:mb-14 lg:mb-16">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#F1FCC2] border border-[#E8F89C] mb-6">
             <span className="w-2 h-2 rounded-full bg-[#1a4032] animate-pulse"></span>
             <span className="text-xs font-bold text-[#1a4032] uppercase tracking-wider">Simple Process</span>
         </div>
-        <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight">
+        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 tracking-tight">
            From Waste to <span className="text-[#C3F53C] bg-[#1a4032] px-3 py-1 rounded-xl inline-block transform -rotate-2">Wealth</span>
         </h2>
       </div>
 
       {/* --- CARDS GRID --- */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 relative">
         
         {/* STEP 1: GATHER & BOOK (White Card) */}
-        <div className="relative bg-white border border-slate-100 rounded-[2.5rem] p-8 h-[380px] flex flex-col justify-between shadow-xl hover:-translate-y-2 transition-transform duration-500 group z-10">
+        <div className="relative bg-white border border-slate-100 rounded-[2rem] lg:rounded-[2.5rem] p-6 lg:p-8 h-[340px] sm:h-[360px] lg:h-[380px] flex flex-col justify-between shadow-xl hover:-translate-y-2 transition-transform duration-500 group z-10">
             {/* Number Pill */}
             <div className="self-start px-4 py-2 bg-slate-100 rounded-full border border-slate-200 text-slate-500 font-bold text-sm">
                 Step 01
@@ -44,14 +44,14 @@ const HowItWorks = () => {
             </div>
 
             {/* BEAUTIFUL CONNECTOR ARROW (Desktop Only) */}
-            <div className="hidden md:flex absolute top-1/2 -right-6 z-30 w-12 h-12 bg-[#1a4032] rounded-full items-center justify-center text-[#C3F53C] shadow-xl border-4 border-white transition-transform hover:scale-110">
+            <div className="hidden lg:flex absolute top-1/2 -right-6 z-30 w-12 h-12 bg-[#1a4032] rounded-full items-center justify-center text-[#C3F53C] shadow-xl border-4 border-white transition-transform hover:scale-110">
                 <ArrowRight size={20} />
             </div>
         </div>
 
 
         {/* STEP 2: PICKUP (Lime Card) */}
-        <div className="relative bg-[#E8F89C] rounded-[2.5rem] p-8 h-[380px] flex flex-col justify-between shadow-xl hover:-translate-y-2 transition-transform duration-500 group z-10">
+        <div className="relative bg-[#E8F89C] rounded-[2rem] lg:rounded-[2.5rem] p-6 lg:p-8 h-[340px] sm:h-[360px] lg:h-[380px] flex flex-col justify-between shadow-xl hover:-translate-y-2 transition-transform duration-500 group z-10">
             {/* Number Pill */}
             <div className="self-start px-4 py-2 bg-white/40 backdrop-blur-sm rounded-full border border-white/20 text-[#1a4032] font-bold text-sm">
                 Step 02
@@ -75,14 +75,14 @@ const HowItWorks = () => {
             </div>
 
              {/* BEAUTIFUL CONNECTOR ARROW (Desktop Only) */}
-             <div className="hidden md:flex absolute top-1/2 -right-6 z-30 w-12 h-12 bg-[#1a4032] rounded-full items-center justify-center text-white shadow-xl border-4 border-[#E8F89C] transition-transform hover:scale-110">
+             <div className="hidden lg:flex absolute top-1/2 -right-6 z-30 w-12 h-12 bg-[#1a4032] rounded-full items-center justify-center text-white shadow-xl border-4 border-[#E8F89C] transition-transform hover:scale-110">
                 <ArrowRight size={20} />
             </div>
         </div>
 
 
         {/* STEP 3: RECYCLE (Dark Green Card) */}
-        <div className="relative bg-[#1a4032] rounded-[2.5rem] p-8 h-[380px] flex flex-col justify-between shadow-2xl hover:-translate-y-2 transition-transform duration-500 group z-10 text-white">
+        <div className="relative bg-[#1a4032] rounded-[2rem] lg:rounded-[2.5rem] p-6 lg:p-8 h-[340px] sm:h-[360px] lg:h-[380px] flex flex-col justify-between shadow-2xl hover:-translate-y-2 transition-transform duration-500 group z-10 text-white">
             {/* Number Pill */}
             <div className="self-start px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/10 text-[#C3F53C] font-bold text-sm">
                 Step 03
