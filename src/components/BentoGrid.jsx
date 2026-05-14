@@ -11,10 +11,10 @@ const BentoGrid = () => {
 
   return (
     <>
-    <div className="flex flex-col xl:flex-row xl:flex-wrap items-center xl:items-stretch justify-center gap-5 w-full max-w-[1400px] mx-auto mb-6 px-2 sm:px-4">
+    <div className="flex flex-col xl:flex-row xl:flex-nowrap xl:items-center xl:justify-center xl:overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden items-center justify-center gap-5 w-full max-w-[1400px] mx-auto mb-6 px-2 sm:px-4">
       
       {/* CARD 1: LOGO ONLY */}
-      <div className="w-full max-w-[420px] xl:max-w-none xl:w-[180px] h-[220px] sm:h-[240px] bg-[#F9FBF6] rounded-[1.5rem] flex items-center justify-center relative overflow-hidden group hover:-translate-y-1 transition-transform duration-500 border border-gray-100 shadow-sm">
+      <div className="w-full max-w-[420px] xl:max-w-none xl:w-[180px] xl:shrink-0 h-[220px] sm:h-[240px] bg-[#F9FBF6] rounded-[1.5rem] flex items-center justify-center relative overflow-hidden group hover:-translate-y-1 transition-transform duration-500 border border-gray-100 shadow-sm">
           <div className="absolute inset-0 pointer-events-none">
              <div className="absolute w-[200px] h-[200px] border-[1px] border-slate-900/5 rounded-full -bottom-10 -left-10 scale-150 group-hover:scale-125 transition-transform duration-700"></div>
              <div className="absolute w-[180px] h-[180px] border-[1px] border-slate-900/5 rounded-full -bottom-10 -left-10 scale-150"></div>
@@ -29,7 +29,7 @@ const BentoGrid = () => {
       </div>
 
       {/* CARD 2: PLASTIC WASTE */}
-      <div className="w-full max-w-[420px] xl:max-w-none xl:w-[240px] h-[300px] sm:h-[320px] bg-[#E8F89C] rounded-[1.5rem] p-6 sm:p-8 flex flex-col justify-center items-center text-center relative overflow-hidden group hover:-translate-y-1 transition-transform duration-500">
+      <div className="w-full max-w-[420px] xl:max-w-none xl:w-[240px] xl:shrink-0 h-[300px] sm:h-[320px] bg-[#E8F89C] rounded-[1.5rem] p-6 sm:p-8 flex flex-col justify-center items-center text-center relative overflow-hidden group hover:-translate-y-1 transition-transform duration-500">
           <div className="absolute -right-8 -top-8 w-24 h-24 bg-white/20 rounded-full blur-xl"></div>
           
           <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm text-green-700 mb-6">
@@ -49,7 +49,7 @@ const BentoGrid = () => {
       {/* CARD 3: VOLUNTEER (Center Hero) */}
       <div 
         onClick={() => setIsJoinModalOpen(true)} 
-        className="w-full max-w-[420px] xl:max-w-none xl:w-[300px] h-[360px] sm:h-[400px] relative group rounded-[2rem] overflow-hidden hover:scale-[1.02] transition-transform duration-500 shadow-xl cursor-pointer"
+        className="w-full max-w-[420px] xl:max-w-none xl:w-[300px] xl:shrink-0 h-[360px] sm:h-[400px] relative group rounded-[2rem] overflow-hidden hover:scale-[1.02] transition-transform duration-500 shadow-xl cursor-pointer"
       >
         <img 
           src={communityImg} 
@@ -70,7 +70,7 @@ const BentoGrid = () => {
       </div>
 
       {/* CARD 4: CHARITY/DONATE */}
-      <div className="w-full max-w-[420px] xl:max-w-none xl:w-[240px] h-[300px] sm:h-[320px] bg-gradient-to-b from-[#1a4032] to-[#0f291e] rounded-[1.5rem] p-6 sm:p-8 flex flex-col justify-center items-center text-center relative overflow-hidden group hover:-translate-y-1 transition-transform duration-500 text-white">
+      <div className="w-full max-w-[420px] xl:max-w-none xl:w-[240px] xl:shrink-0 h-[300px] sm:h-[320px] bg-gradient-to-b from-[#1a4032] to-[#0f291e] rounded-[1.5rem] p-6 sm:p-8 flex flex-col justify-center items-center text-center relative overflow-hidden group hover:-translate-y-1 transition-transform duration-500 text-white">
           <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?q=80&w=2000&auto=format&fit=crop')] opacity-10 mix-blend-overlay bg-cover"></div>
           
           <div className="relative z-10 flex flex-col items-center">
@@ -95,7 +95,7 @@ const BentoGrid = () => {
       {/* CARD 5: AI EDUCATION BOT */}
       <div 
         onClick={() => setIsEcoBotOpen(true)} 
-        className="w-full max-w-[420px] xl:max-w-none xl:w-[180px] h-[220px] sm:h-[240px] bg-[#F1FCC2] rounded-[1.5rem] p-5 flex flex-col justify-center items-center text-center relative overflow-hidden group hover:-translate-y-1 transition-transform duration-500 cursor-pointer"
+        className="w-full max-w-[420px] xl:max-w-none xl:w-[180px] xl:shrink-0 h-[220px] sm:h-[240px] bg-[#F1FCC2] rounded-[1.5rem] p-5 flex flex-col justify-center items-center text-center relative overflow-hidden group hover:-translate-y-1 transition-transform duration-500 cursor-pointer"
       >
          <div className="absolute inset-0 flex items-center justify-center opacity-60 pointer-events-none">
              <div className="absolute w-[220px] h-[220px] border-[12px] border-[#dcf29d] rounded-full group-hover:scale-105 transition-transform duration-700"></div>
