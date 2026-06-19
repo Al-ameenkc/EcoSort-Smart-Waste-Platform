@@ -1,0 +1,37 @@
+@import "tailwindcss";
+@config "../tailwind.config.js";
+@plugin "tailwindcss-animate";
+
+/* Ensure hover-capable devices get pointer cursor on interactive elements */
+@media (hover: hover) and (pointer: fine) {
+  button:not(:disabled),
+  a[href],
+  [role="button"] {
+    cursor: pointer;
+  }
+}
+
+/* Pulsing marker for drainage blockages on logistics map */
+@keyframes drainage-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  }
+  50% {
+    transform: scale(1.15);
+    box-shadow: 0 0 0 12px rgba(239, 68, 68, 0);
+  }
+}
+
+.drainage-marker-pulse {
+  animation: drainage-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes storm-banner-flash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+
+.storm-surge-banner {
+  animation: storm-banner-flash 1.8s ease-in-out infinite;
+}
