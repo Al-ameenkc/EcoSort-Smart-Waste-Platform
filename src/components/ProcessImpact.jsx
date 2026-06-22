@@ -19,26 +19,25 @@ const ProcessImpact = () => {
             </h2>
 
             <p className="text-slate-500 text-sm leading-relaxed mb-6">
-                At KanemWaste, we employ state-of-the-art technology and environmentally-friendly methods to recycle plastic waste efficiently. Our process includes:
+                We collect from pickup bins and gatherers, clean and compress plastic, then sell to our recycling partner. Our process:
             </p>
 
-            {/* Reduced spacing: space-y-4 -> space-y-3 */}
             <ul className="space-y-3 text-left">
                 <li className="text-sm text-slate-600">
                     <strong className="text-slate-900 block mb-0.5">Collection:</strong> 
-                    Partnering with local communities, businesses, and organizations to gather plastic waste.
-                </li>
-                <li className="text-sm text-slate-600">
-                    <strong className="text-slate-900 block mb-0.5">Sorting:</strong> 
-                    Using advanced sorting systems to separate different types of plastics.
-                </li>
-                <li className="text-sm text-slate-600">
-                    <strong className="text-slate-900 block mb-0.5">Cleaning:</strong> 
-                    Thoroughly cleaning the collected plastics to remove any contaminants.
+                    Plastic gathered from bins and local gatherers across our service areas.
                 </li>
                 <li className="text-sm text-slate-600">
                     <strong className="text-slate-900 block mb-0.5">Processing:</strong> 
-                    Breaking down the plastics into raw materials that can be reused.
+                    Waste is cleaned, sorted, and compressed for bulk sale.
+                </li>
+                <li className="text-sm text-slate-600">
+                    <strong className="text-slate-900 block mb-0.5">Flood Response:</strong> 
+                    Verified community tips trigger hands-on drainage clearance before storms.
+                </li>
+                <li className="text-sm text-slate-600">
+                    <strong className="text-slate-900 block mb-0.5">Reinvestment:</strong> 
+                    B2B recycling revenue funds pickup logistics, tip rewards, and flood operations.
                 </li>
             </ul>
         </div>
@@ -72,18 +71,18 @@ const ProcessImpact = () => {
             {/* Reduced spacing: space-y-3 -> space-y-2 */}
             <ul className="space-y-2 mb-6 text-left list-disc pl-5 marker:text-green-500">
                 <li className="text-sm text-slate-600">
-                    Recycled hundreds of tons of plastic waste.
+                    Cleared drainage bottlenecks before major storms since 2023.
                 </li>
                 <li className="text-sm text-slate-600">
-                    Reduced carbon emissions by 25%.
+                    Paid cash rewards for verified community hazard tips.
                 </li>
                 <li className="text-sm text-slate-600">
-                    Educated individuals about the importance of recycling.
+                    Aggregated tons of PET plastic for factory recycling.
                 </li>
             </ul>
 
             <p className="text-slate-500 text-xs md:text-sm leading-relaxed italic border-l-4 border-[#C3F53C] pl-4 text-left">
-                "Our efforts have not only contributed to a cleaner environment but have also promoted sustainable practices and raised awareness about the critical issue of plastic pollution."
+                &quot;Our pickup fee sustains the trucks. Our factory sales fund the floods team. And residents earn every step of the way.&quot;
             </p>
         </div>
 

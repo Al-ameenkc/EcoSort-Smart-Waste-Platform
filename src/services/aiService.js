@@ -6,7 +6,11 @@ You are Eco-AI, the official assistant for KanemWaste, a smart waste management 
 - **Phone:** +234 808 021 0809
 - **WhatsApp:** +234 808 021 0809
 - **Address:** B39, Standard Estate Cadastral Zone 7, Galadimawa district FCT-Abuja.
-- **Mission:** Empowering communities through smart recycling, innovation, and resource recovery.
+- **Mission:** Community-powered waste collection and flood prevention in Abuja.
+- **Weekly Pickup Fee:** ₦2,000 per week, paid in cash on pickup. This fee sustains fuel and logistics. It is NOT charged for profit.
+- **Drop-off:** Customers who bring PET bottles directly to us get paid cash. No weekly fee for drop-offs.
+- **Service Areas:** We only operate in listed Abuja areas (Lokogoma, Galadimawa, Apo, Apo Resettlement, Durumi, Gaduwa, Games Village, Lugbe). Each area has a fixed pickup day. If a user's area is not listed, we don't operate there yet.
+- **Flood Operations:** Since 2023, we clear blocked drainage before storms, pay cash rewards for verified community hazard tips, and fund this through recycling revenue.
 
 **YOUR INSTRUCTIONS:**
 
@@ -40,105 +44,135 @@ You are Eco-AI, the official assistant for KanemWaste, a smart waste management 
     * Do not engage in harmful, illegal, or explicit conversations.
 `;
 
-// --- HELPER: Handle Image Input Correctly ---
+const SNAP_SORT_INSTRUCTION = `You are SnapSort, a waste identification assistant for KanemWaste in Abuja, Nigeria.
+Analyze the image and return ONLY valid JSON with keys: itemName, isRecyclable (boolean), confidence (0-100), reasoning (string), handlingTips (string array).
+Focus on PET bottles, plastics, cartons, and common household waste in Nigeria.`;
+
+let aiRequestInFlight = false;
+
+const formatAiError = (error, productName) => {
+  if (error.message?.includes('already in progress')) return error.message;
+
+  const msg = error.message || '';
+  if (msg.includes('API key not valid') || msg.includes('API_KEY_INVALID')) {
+    return `${productName}: Invalid Gemini API key. Create one at aistudio.google.com/apikey (starts with AIza).`;
+  }
+  if (msg.includes('limit: 0') || msg.includes('free_tier')) {
+    return `${productName}: Your Google project has no free-tier quota on this key. Create a free key at aistudio.google.com/apikey (starts with AIzaSy).`;
+  }
+  if (msg.includes('not found') || msg.includes('not supported')) {
+    return `${productName}: Gemini model unavailable. Restart the dev server after updating GEMINI_MODEL in .env.local.`;
+  }
+  if (msg.includes('quota') || msg.includes('RESOURCE_EXHAUSTED') || msg.includes('billing')) {
+    return `${productName}: Gemini rate limit reached. Wait a minute and try again.`;
+  }
+  return msg.length < 220 ? msg : `${productName}: Could not reach the AI service. Check your API key.`;
+};
+
+export const isAiRequestInFlight = () => aiRequestInFlight;
+
 const getBase64Image = async (input) => {
-  // 1. If it's already a Base64 string (starts with data:image...), just return it.
   if (typeof input === 'string' && input.startsWith('data:image')) {
     return input;
   }
 
-  // 2. If it's a URL (http...), fetch and convert it
   try {
     const response = await fetch(input);
     const blob = await response.blob();
     return new Promise((resolve) => {
       const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result); 
+      reader.onloadend = () => resolve(reader.result);
       reader.readAsDataURL(blob);
     });
   } catch (e) {
-    console.error("Image conversion failed", e);
+    console.error('Image conversion failed', e);
     return null;
   }
 };
 
-// --- API CALLER ---
 async function callMySecureAPI(messages, jsonMode = false) {
-    try {
-        const response = await fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                model: "gpt-4o-mini",
-                messages: messages,
-                response_format: jsonMode ? { type: "json_object" } : undefined
-            })
-        });
+  if (aiRequestInFlight) {
+    throw new Error('An AI request is already in progress. Please wait for it to finish.');
+  }
 
-        // Check for 413 or other server errors explicitly
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error(`Server Error ${response.status}:`, errorText);
-            throw new Error(`Server responded with ${response.status}`);
-        }
+  aiRequestInFlight = true;
 
-        const data = await response.json();
-        return data.content;
-    } catch (error) {
-        console.error("API Call Failed:", error);
-        throw error;
+  try {
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages,
+        response_format: jsonMode ? { type: 'json_object' } : undefined,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Server Error ${response.status}:`, errorText);
+      let detail = `Server responded with ${response.status}`;
+      try {
+        const parsed = JSON.parse(errorText);
+        if (parsed.error) detail = parsed.error;
+      } catch { /* use default */ }
+      throw new Error(detail);
     }
+
+    const data = await response.json();
+    return data.content;
+  } finally {
+    aiRequestInFlight = false;
+  }
 }
 
 export const identifyWaste = async (imageInput) => {
   try {
-    // 1. Get clean Base64 string
     const base64Image = await getBase64Image(imageInput);
-    
+
     if (!base64Image) {
-        throw new Error("Invalid image data");
+      throw new Error('Invalid image data');
     }
 
-    // 2. Construct the message payload
     const messages = [
-        {
-          role: "system",
-          content: `${SYSTEM_INSTRUCTION} \n\n TASK: Analyze this waste. Return ONLY valid JSON.`
-        },
-        {
-          role: "user",
-          content: [
-            { type: "text", text: "Identify this item. Return JSON: { \"itemName\": \"...\", \"isRecyclable\": true/false, \"confidence\": 0-100, \"reasoning\": \"...\", \"handlingTips\": [\"...\"] }" },
-            { type: "image_url", image_url: { url: base64Image } }
-          ]
-        }
+      {
+        role: 'system',
+        content: SNAP_SORT_INSTRUCTION,
+      },
+      {
+        role: 'user',
+        content: [
+          {
+            type: 'text',
+            text: 'Identify this item. Return JSON: { "itemName": "...", "isRecyclable": true/false, "confidence": 0-100, "reasoning": "...", "handlingTips": ["..."] }',
+          },
+          { type: 'image_url', image_url: { url: base64Image } },
+        ],
+      },
     ];
 
-    const content = await callMySecureAPI(messages, true); // true = expect JSON
+    const content = await callMySecureAPI(messages, true);
     return JSON.parse(content);
-
   } catch (error) {
-    console.error("Identify Error:", error);
-    throw new Error("Could not analyze image. Please try a smaller photo.");
+    console.error('Identify Error:', error);
+    throw new Error(formatAiError(error, 'SnapSort'));
   }
 };
 
 export const chatAboutWaste = async (message, context) => {
   try {
-    const contextString = context.itemName 
-        ? `User is currently looking at: ${context.itemName}.` 
-        : "General recycling question.";
+    const contextString = context.itemName
+      ? `User is currently looking at: ${context.itemName}.`
+      : 'General recycling question.';
 
     const messages = [
-        { role: "system", content: SYSTEM_INSTRUCTION },
-        { role: "system", content: `CONTEXT: ${contextString}` },
-        { role: "user", content: message }
+      { role: 'system', content: SYSTEM_INSTRUCTION },
+      { role: 'system', content: `CONTEXT: ${contextString}` },
+      { role: 'user', content: message },
     ];
 
     return await callMySecureAPI(messages, false);
-
   } catch (error) {
-    console.error("Chat Error:", error);
-    return "I'm having trouble connecting to the server.";
+    console.error('Chat Error:', error);
+    return formatAiError(error, 'Eco-AI');
   }
 };

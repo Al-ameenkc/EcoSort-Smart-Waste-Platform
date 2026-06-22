@@ -1,5 +1,6 @@
 import React from 'react';
 import { Target, Lightbulb, Users } from 'lucide-react';
+import { getServiceAreaNames } from '../constants/serviceAreas';
 
 const OurStory = () => {
   return (
@@ -17,20 +18,20 @@ const OurStory = () => {
                 </div>
 
                 <h2 className="text-3xl md:text-5xl font-bold mb-6 leading-tight">
-                    From a local initiative to a <span className="text-[#C3F53C]">global vision.</span>
+                    From community pickups to a <span className="text-[#C3F53C]">self-sustaining loop.</span>
                 </h2>
                 <div className="space-y-4 text-slate-300 text-base md:text-lg leading-relaxed">
                     <p>
-                        KanemWaste began with a simple observation: our streets were cluttered, but our community had untapped energy. <strong className="text-white">Born from a passion for sustainability</strong>, we set out to bridge the gap between waste and wealth.
+                        KanemWaste started in Abuja with a simple idea: plastic bottles clogging drains cause floods, and those same bottles have real value when recycled. <strong className="text-white">We collect from bins and gatherers</strong>, clean and compress plastic, and charge a small weekly fee for door-to-door pickup to cover fuel and keep the service running.
                     </p>
                     <p>
-                        What started as a grassroots team has evolved into a <strong className="text-white">tech-enabled logistics network</strong>. We don't just pick up trash; we use AI to analyze waste patterns, algorithms to optimize routes, and education to empower the next generation of eco-warriors.
+                        Today we operate across selected Abuja neighbourhoods on fixed pickup days, aggregate bulk plastic for our partner factory, and use that B2B revenue to fund emergency drainage clearance and cash rewards for verified flood hazard tips from local residents.
                     </p>
                 </div>
                 
                 <div className="mt-10 flex flex-col sm:flex-row gap-8">
-                    <StoryPoint icon={Lightbulb} title="Innovation" desc="AI-driven sorting tech." />
-                    <StoryPoint icon={Users} title="Community" desc="Empowering local youths." />
+                    <StoryPoint icon={Lightbulb} title="Circular Economy" desc="Recycle revenue funds flood ops." />
+                    <StoryPoint icon={Users} title="Community First" desc="Residents earn from tips & bottles." />
                 </div>
             </div>
 
@@ -57,8 +58,8 @@ const OurStory = () => {
                 <div className="space-y-4">
                     {/* Card: h-44 */}
                     <div className="h-44 bg-white/10 backdrop-blur-sm border border-white/10 rounded-[2rem] p-6 flex flex-col justify-end shadow-lg">
-                        <span className="text-3xl font-bold text-[#C3F53C] mb-1">24/7</span>
-                        <span className="text-xs text-slate-300 font-medium">Operations Active</span>
+                        <span className="text-3xl font-bold text-[#C3F53C] mb-1">{getServiceAreaNames().length}</span>
+                        <span className="text-xs text-slate-300 font-medium">Service Areas</span>
                     </div>
                     {/* Image: h-60 */}
                     <div className="h-60 rounded-[2rem] overflow-hidden shadow-lg">

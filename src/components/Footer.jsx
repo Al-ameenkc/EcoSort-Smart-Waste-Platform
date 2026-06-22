@@ -36,7 +36,7 @@ const Footer = () => {
                     <span className="text-lg font-semibold tracking-tight text-slate-900">KanemWaste</span>
                 </Link>
                 <p className="text-slate-500 text-sm leading-relaxed mb-6 max-w-xs">
-                    Empowering communities to create a cleaner, greener future through smart recycling and innovation.
+                    Community-powered waste collection and flood prevention in Abuja. Weekly pickup from ₦2,000, cash on arrival.
                 </p>
                 <div className="flex gap-4">
                     <SocialIcon href="https://instagram.com" icon={<Instagram size={18}/>} />
@@ -71,7 +71,7 @@ const Footer = () => {
                             Eco-AI
                         </button>
                     </li>
-                    <li><a href="#" className="hover:text-green-600 transition-colors">Privacy Policy</a></li>
+                    <li><Link to="/privacy" onClick={handleScrollTop} className="hover:text-green-600 transition-colors">Privacy Policy</Link></li>
                     <li><a href="#" className="hover:text-green-600 transition-colors">Media</a></li>
                 </ul>
             </div>

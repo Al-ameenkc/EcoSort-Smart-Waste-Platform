@@ -39,7 +39,7 @@ const nearestNeighborRoute = (locations, startCoords) => {
 };
 
 /**
- * Pure nearest-neighbor TSP — used by Route Optimizer and as the default here.
+ * Pure nearest-neighbor TSP. Used by Route Optimizer and as the default here.
  */
 export const solveTSP = (locations, startCoords) => {
   if (!locations?.length) return [];

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Bot, Send, User, Sparkles, Loader2, Camera, Truck, Info, ExternalLink } from 'lucide-react';
 import ReactMarkdown from 'react-markdown'; 
-import { chatAboutWaste } from '../services/aiService';
+import { chatAboutWaste, isAiRequestInFlight } from '../services/aiService';
 import { useNavigate } from 'react-router-dom';
 
 const EcoBotSidebar = ({ isOpen, onClose }) => {
@@ -53,7 +53,7 @@ const EcoBotSidebar = ({ isOpen, onClose }) => {
 
   const handleSend = async (e) => {
     e.preventDefault();
-    if (!inputValue.trim()) return;
+    if (!inputValue.trim() || isTyping || isAiRequestInFlight()) return;
     const userText = inputValue;
     setInputValue(""); 
     setMessages(prev => [...prev, { id: Date.now(), type: 'user', text: userText }]);
@@ -169,7 +169,7 @@ const EcoBotSidebar = ({ isOpen, onClose }) => {
                 <input type="text" value={inputValue} onChange={(e) => setInputValue(e.target.value)} placeholder="Type your question..." disabled={isTyping} className="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-full pl-5 pr-14 py-3 focus:outline-none focus:border-[#1a4032] focus:ring-1 focus:ring-[#1a4032] transition-all disabled:opacity-60" />
                 <button type="submit" className="absolute right-1.5 w-10 h-10 flex items-center justify-center bg-[#C3F53C] hover:bg-[#b2e32b] rounded-full text-[#1a4032] transition-colors shadow-sm disabled:opacity-50 disabled:scale-95" disabled={!inputValue.trim() || isTyping}><Send size={18} className="ml-0.5" /></button>
             </form>
-            <div className="flex justify-center mt-2 gap-2"><span className="text-[10px] text-slate-400 flex items-center gap-1"><Sparkles size={10} /> Powered by OpenAI</span></div>
+            <div className="flex justify-center mt-2 gap-2"><span className="text-[10px] text-slate-400 flex items-center gap-1"><Sparkles size={10} /> One request at a time</span></div>
         </div>
 
       </div>

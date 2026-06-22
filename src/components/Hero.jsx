@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowUpRight, Leaf, Recycle, Sun, CircleDashed, Heart } from 'lucide-react'; 
+import { ArrowUpRight, Leaf, Recycle, Sun, CircleDashed, Heart, ScanLine } from 'lucide-react'; 
 import { Link } from 'react-router-dom'; 
 import JoinUsModal from './JoinUsModal'; 
 
@@ -105,6 +105,10 @@ const Hero = () => {
   const renderHighlight = currentText.slice(startLen + 1, startLen + 1 + highLen); 
   const renderEnd = currentText.slice(startLen + 1 + highLen + 1);
 
+  const handleQuickSort = () => {
+    window.dispatchEvent(new Event('open-snapsort'));
+  };
+
   const isFullTextTyped = charIndex === fullString.length;
 
   return (
@@ -201,29 +205,33 @@ const Hero = () => {
 
         </div>
 
-        {/* ROW 2: Description -- Buttons */}
-        <div className="w-full flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-10">
-            <div className="lg:w-1/3 lg:pl-4">
-                <p className="text-gray-500 text-base sm:text-lg text-center lg:text-left leading-relaxed max-w-xs mx-auto lg:mx-0">
-                  We are an organization that educates society about the problems of ecology and nature using AI technology.
-                </p>
-            </div>
+        {/* ROW 2: Buttons */}
+        <div className="w-full flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 px-4 sm:px-0">
+            <Link 
+                to="/join-as-gatherer"
+                className="w-full sm:w-auto bg-[#C3F53C] hover:bg-[#b2e32b] text-black transition-all px-6 sm:px-8 py-3.5 sm:py-4 rounded-full flex items-center justify-center gap-2.5 sm:gap-3 font-semibold text-base sm:text-lg shadow-xl shadow-lime-200/50 hover:scale-105 hover:shadow-lime-200/80 group"
+            >
+                Start Earning <ArrowUpRight size={22} className="group-hover:rotate-45 transition-transform" />
+            </Link>
 
-            <div className="lg:w-auto flex flex-col sm:flex-row items-center gap-3 sm:gap-4 lg:pr-4">
-                 <Link 
-                    to="/book-pickup"
-                    className="bg-[#C3F53C] hover:bg-[#b2e32b] text-black transition-all px-6 sm:px-8 py-3.5 sm:py-4 rounded-full flex items-center gap-2.5 sm:gap-3 font-semibold text-base sm:text-lg shadow-xl shadow-lime-200/50 hover:scale-105 hover:shadow-lime-200/80 group"
-                 >
-                    Start Earning <ArrowUpRight size={22} className="group-hover:rotate-45 transition-transform" />
-                 </Link>
+            <div className="flex flex-row items-center justify-center gap-3 w-full sm:w-auto">
+                <button
+                    type="button"
+                    onClick={handleQuickSort}
+                    className="flex-1 sm:flex-none bg-white border border-slate-200 text-slate-900 hover:bg-slate-50 transition-all px-5 sm:px-8 py-3.5 sm:py-4 rounded-full flex items-center justify-center gap-2 font-semibold text-base sm:text-lg hover:scale-105 whitespace-nowrap"
+                >
+                    <ScanLine size={18} className="text-[#1a4032]" />
+                    Quick Sort
+                </button>
 
-                 <button 
+                <button 
+                    type="button"
                     onClick={() => setIsJoinModalOpen(true)}
-                    className="bg-white border border-slate-200 text-slate-900 hover:bg-slate-50 transition-all px-6 sm:px-8 py-3.5 sm:py-4 rounded-full flex items-center gap-2.5 sm:gap-3 font-semibold text-base sm:text-lg hover:scale-105"
-                 >
+                    className="flex-1 sm:flex-none bg-white border border-slate-200 text-slate-900 hover:bg-slate-50 transition-all px-5 sm:px-8 py-3.5 sm:py-4 rounded-full flex items-center justify-center gap-2 font-semibold text-base sm:text-lg hover:scale-105 whitespace-nowrap"
+                >
                     <Heart size={20} className="text-[#C3F53C]" fill="currentColor" />
                     Join Us
-                 </button>
+                </button>
             </div>
         </div>
 

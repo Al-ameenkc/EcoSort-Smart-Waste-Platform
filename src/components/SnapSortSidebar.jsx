@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom'; 
 import { X, Bot, CheckCircle, AlertTriangle, Loader2, Send, RefreshCw, User } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
-import { identifyWaste, chatAboutWaste } from '../services/aiService';
+import { identifyWaste, chatAboutWaste, isAiRequestInFlight } from '../services/aiService';
 import imageCompression from 'browser-image-compression'; // <--- 1. IMPORT THIS
 
 const SnapSortSidebar = ({ isOpen, onClose, image, onScanAgain }) => {
@@ -19,62 +19,53 @@ const SnapSortSidebar = ({ isOpen, onClose, image, onScanAgain }) => {
   const [isChatting, setIsChatting] = useState(false);
   
   const scrollRef = useRef(null);
-  const fileInputRef = useRef(null); 
-  const hasScannedRef = useRef(false); 
-  const lastImageRef = useRef(null);
+  const fileInputRef = useRef(null);
 
-  // Sync prop image
   useEffect(() => {
     if (isOpen && image) setCurrentImage(image);
   }, [isOpen, image]);
 
-  // Auto-scroll
+  useEffect(() => {
+    if (!isOpen) {
+      setMessages([]);
+      setLatestAnalysis(null);
+      setInput('');
+    }
+  }, [isOpen]);
+
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [messages, isScanning, isChatting]);
 
-  // --- MAIN ANALYSIS EFFECT ---
-  useEffect(() => {
-    if (isOpen && currentImage) {
-      // Prevent re-scanning the exact same image content
-      if (hasScannedRef.current && lastImageRef.current === currentImage) return; 
+  const handleAnalyze = async () => {
+    if (!currentImage || isScanning || isChatting || isAiRequestInFlight()) return;
 
-      const runAnalysis = async () => {
-        setIsScanning(true);
-        
-        hasScannedRef.current = true;
-        lastImageRef.current = currentImage;
+    setIsScanning(true);
 
-        try {
-          const result = await identifyWaste(currentImage);
-          setLatestAnalysis(result); // Update context for chat
-          
-          // PUSH THE RESULT AS A MESSAGE INTO HISTORY
-          setMessages(prev => [
-            ...prev, 
-            { 
-              role: 'scan_result', 
-              image: currentImage, // Store the specific image for this result
-              data: result 
-            }
-          ]);
-          
-        } catch (error) {
-          console.error("Analysis failed:", error);
-          // Unlock on error so they can try again
-          hasScannedRef.current = false;
-          lastImageRef.current = null;
-          
-          // Show error bubble
-          setMessages(prev => [...prev, { role: 'error', text: "Could not analyze image. It might be too large or the server is busy." }]);
-        } finally {
-            setIsScanning(false);
-        }
-      };
-
-      runAnalysis();
+    try {
+      const result = await identifyWaste(currentImage);
+      setLatestAnalysis(result);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'scan_result',
+          image: currentImage,
+          data: result,
+        },
+      ]);
+    } catch (error) {
+      console.error('Analysis failed:', error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'error',
+          text: error.message || 'Could not analyze image. It might be too large or the server is busy.',
+        },
+      ]);
+    } finally {
+      setIsScanning(false);
     }
-  }, [isOpen, currentImage]);
+  };
 
   // --- HANDLERS ---
   const handleScanNewClick = () => {
@@ -98,7 +89,9 @@ const SnapSortSidebar = ({ isOpen, onClose, image, onScanAgain }) => {
             // Convert Compressed file to Base64 to display and send
             const reader = new FileReader();
             reader.onloadend = () => {
-                setCurrentImage(reader.result); // This triggers the useEffect above
+                setCurrentImage(reader.result);
+                setLatestAnalysis(null);
+                setMessages([]);
             };
             reader.readAsDataURL(compressedFile);
 
@@ -115,15 +108,17 @@ const SnapSortSidebar = ({ isOpen, onClose, image, onScanAgain }) => {
 
   const handleSend = async (e) => {
     e.preventDefault();
-    if (!input.trim() || !latestAnalysis) return;
+    if (!input.trim() || !latestAnalysis || isChatting || isScanning || isAiRequestInFlight()) return;
     const q = input;
-    setInput(""); 
+    setInput("");
     setMessages(prev => [...prev, { role: 'user', text: q }]);
     setIsChatting(true);
     const ans = await chatAboutWaste(q, latestAnalysis);
     setMessages(prev => [...prev, { role: 'bot', text: ans }]);
     setIsChatting(false);
   };
+
+  const hasPendingImage = currentImage && !latestAnalysis && !isScanning;
 
   if (!isOpen) return null;
 
@@ -147,6 +142,23 @@ const SnapSortSidebar = ({ isOpen, onClose, image, onScanAgain }) => {
 
         {/* FEED (Timeline) */}
         <div ref={scrollRef} className="flex-1 overflow-y-auto p-5 space-y-6 bg-slate-50/50 scroll-smooth">
+
+            {hasPendingImage && (
+              <div className="flex flex-col items-end gap-3 animate-in fade-in slide-in-from-bottom-4">
+                <div className="w-[70%] bg-white p-1.5 rounded-2xl rounded-tr-none shadow-sm border border-slate-200">
+                  <img src={currentImage} alt="Ready to analyze" className="w-full h-auto rounded-xl" />
+                </div>
+                <button
+                  type="button"
+                  onClick={handleAnalyze}
+                  disabled={isScanning || isChatting || isAiRequestInFlight()}
+                  className="w-full max-w-[280px] mx-auto py-3 bg-[#1a4032] hover:bg-[#143026] text-[#C3F53C] rounded-xl text-sm font-bold transition-colors disabled:opacity-60"
+                >
+                  Analyze with AI
+                </button>
+                <p className="text-[10px] text-slate-400 text-center w-full">One AI request at a time. Nothing is sent until you tap Analyze.</p>
+              </div>
+            )}
             
             {messages.map((msg, index) => {
                 

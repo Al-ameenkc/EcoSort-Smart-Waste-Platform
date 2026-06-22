@@ -5,6 +5,9 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import AboutUs from './pages/AboutUs';
 import BookPickup from './pages/BookPickup';
+import JoinAsGatherer from './pages/JoinAsGatherer';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import Terms from './pages/Terms';
 import EcoBotSidebar from './components/EcoBotSidebar';
 import Management from './pages/Management';
 
@@ -64,6 +67,9 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/book-pickup" element={<BookPickup />} />
+            <Route path="/join-as-gatherer" element={<JoinAsGatherer />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<Terms />} />
             
             {/* Catch-all 404 for regular users (Keeps Navbar) */}
             <Route path="*" element={

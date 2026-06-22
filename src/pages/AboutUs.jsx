@@ -1,8 +1,10 @@
 import React from 'react';
 import WhoWeAre from '../components/WhoWeAre';
 import OurStory from '../components/OurStory';
-import ProcessImpact from '../components/ProcessImpact'; // Assuming you have this
-import OurMission from '../components/OurMission'; // Assuming you have this
+import ProcessImpact from '../components/ProcessImpact';
+import OurMission from '../components/OurMission';
+import ServiceCoverage from '../components/ServiceCoverage';
+import FloodOperations from '../components/FloodOperations';
 import Reveal from '../components/Reveal';
 import PageWrapper from '../components/PageWrapper';
 
@@ -20,9 +22,17 @@ const AboutUs = () => {
           <Reveal delay={200}>
             <OurStory />
           </Reveal>
+
+          <Reveal>
+            <ServiceCoverage />
+          </Reveal>
           
           <Reveal>
             <ProcessImpact />
+          </Reveal>
+
+          <Reveal delay={100}>
+            <FloodOperations />
           </Reveal>
           
           <Reveal>

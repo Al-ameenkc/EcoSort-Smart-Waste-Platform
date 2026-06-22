@@ -24,9 +24,9 @@ const OurMission = () => {
         </h2>
         
         <p className="text-base md:text-xl leading-relaxed opacity-90 font-light">
-          Our mission is to reduce the environmental footprint of plastic waste by implementing innovative recycling solutions. We strive to promote a circular economy where plastic is reused, recycled, and repurposed, minimizing its impact on the environment. 
+          Our mission is to keep Abuja&apos;s neighbourhoods clean and flood-resilient through honest, community-powered waste management. We charge a modest weekly pickup fee to sustain logistics, never for profit, while rewarding verified drainage hazard tips.
           <br /><br />
-          <span className="font-medium text-[#C3F53C]">KanemWaste</span> is dedicated to educating communities about the importance of recycling and empowering them to take action in preserving our planet for future generations.
+          <span className="font-medium text-[#C3F53C]">KanemWaste</span> turns plastic waste into factory-ready material, funds hands-on drainage clearance before storms hit, and gives everyday residents a direct stake in protecting their streets.
         </p>
       </div>
 

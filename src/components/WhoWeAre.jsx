@@ -26,31 +26,29 @@ const WhoWeAre = () => {
             </div>
             
             <h1 className="text-4xl md:text-6xl font-bold text-[#1a4032] leading-[1.1] mb-6 tracking-tight">
-                Pioneering <br/>
+                Smart waste & <br/>
                 <span className="relative inline-block">
                     <span className="absolute inset-0 bg-[#C3F53C] -rotate-2 rounded-lg -z-10 transform scale-105"></span>
-                    Smart Waste
+                    flood resilience
                 </span> <br/>
-                Management.
+                for Abuja.
             </h1>
 
             <p className="text-base md:text-lg text-slate-600 leading-relaxed mb-8 max-w-lg">
-                KanemWaste is more than just a recycling company. We are a tech-driven movement dedicated to transforming how communities perceive and handle waste, turning everyday trash into sustainable treasure.
+                KanemWaste collects plastic from pickup bins and gatherers across Abuja, cleans and compresses it for our recycling partner, and runs community-powered flood prevention funded through a circular economy model.
             </p>
 
             <div className="flex items-center gap-8">
-                {/* STAT 1: AI LOGIC */}
                 <div className="flex flex-col">
-                    <span className="text-3xl font-bold text-[#1a4032]">95%</span>
-                    <span className="text-xs text-slate-500 font-medium">AI Precision</span>
+                    <span className="text-3xl font-bold text-[#1a4032]">₦2K</span>
+                    <span className="text-xs text-slate-500 font-medium">Weekly pickup fee</span>
                 </div>
                 
                 <div className="w-px h-10 bg-slate-200"></div>
                 
-                {/* STAT 2: LOGISTICS IMPACT - UPDATED TO 25% */}
                 <div className="flex flex-col">
-                    <span className="text-3xl font-bold text-[#1a4032]">25%</span>
-                    <span className="text-xs text-slate-500 font-medium">CO₂ Reduced</span>
+                    <span className="text-3xl font-bold text-[#1a4032]">2023</span>
+                    <span className="text-xs text-slate-500 font-medium">Flood ops since</span>
                 </div>
             </div>
         </div>

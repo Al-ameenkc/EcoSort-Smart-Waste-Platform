@@ -39,7 +39,7 @@ const HowItWorks = () => {
             <div className="text-center z-10 mt-20">
                 <h3 className="text-xl font-bold text-slate-900 mb-2">Gather & Book</h3>
                 <p className="text-sm text-slate-500 leading-relaxed max-w-[80%] mx-auto">
-                    Gather your plastic waste and schedule a pickup instantly via our platform.
+                    Collect your plastic waste and book pickup in your service area. Don&apos;t see your location? We haven&apos;t expanded there yet.
                 </p>
             </div>
 
@@ -68,9 +68,9 @@ const HowItWorks = () => {
 
             {/* Content */}
             <div className="text-center z-10 mt-20">
-                <h3 className="text-xl font-bold text-[#1a4032] mb-2">Smart Pickup</h3>
+                <h3 className="text-xl font-bold text-[#1a4032] mb-2">Weekly Pickup</h3>
                 <p className="text-sm text-[#1a4032]/80 font-medium leading-relaxed">
-                    Our specialized trucks follow AI-optimized routes to collect waste efficiently.
+                    We collect on your area&apos;s fixed day. Pay ₦2,000 in cash on pickup. This sustains fuel and logistics, not profit.
                 </p>
             </div>
 
@@ -99,9 +99,9 @@ const HowItWorks = () => {
 
             {/* Content */}
             <div className="text-center z-10 mt-20">
-                <h3 className="text-xl font-bold text-white mb-2">Earn & Recycle</h3>
+                <h3 className="text-xl font-bold text-white mb-2">Earn or Drop Off</h3>
                 <p className="text-sm text-slate-300 leading-relaxed">
-                    Waste is processed into raw materials, and you get paid instantly.
+                    Bring bottles to us and get paid cash. Or let us pick up weekly. Your waste funds flood prevention in your community.
                 </p>
             </div>
         </div>

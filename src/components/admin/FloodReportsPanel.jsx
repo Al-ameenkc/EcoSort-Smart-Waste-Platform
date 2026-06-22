@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Droplets, Waves, Plus, MapPin, Phone, Filter } from 'lucide-react';
 import { createAdminFloodReport, REPORT_TYPES, REPORT_STATUSES } from '../../services/floodReportService';
-import { ZONE_ANCHORS } from '../../constants/abujaZones';
+import { getServiceAreaNames } from '../../constants/serviceAreas';
 import FloodReportDetailModal from './FloodReportDetailModal';
 import CustomAlert from '../CustomAlert';
 
@@ -136,7 +136,7 @@ const FloodReportsPanel = ({ reports = [] }) => {
                 required
               >
                 <option value="">Select zone...</option>
-                {Object.keys(ZONE_ANCHORS).map((z) => (
+                {getServiceAreaNames().map((z) => (
                   <option key={z} value={z}>{z}</option>
                 ))}
               </select>
@@ -216,11 +216,11 @@ const FloodReportsPanel = ({ reports = [] }) => {
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 font-medium text-slate-800">{report.zone || '—'}</td>
+                  <td className="px-6 py-4 font-medium text-slate-800">{report.zone || 'N/A'}</td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
                       <Phone size={14} className="text-slate-400" />
-                      <span>{report.phone || '—'}</span>
+                      <span>{report.phone || 'N/A'}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4">

@@ -43,7 +43,7 @@ const BentoGrid = () => {
               Plastic <br/> & Waste
             </h3>
             <p className="text-sm text-slate-800 font-medium leading-relaxed">
-              We collect PET bottles, hard plastics, and recyclables to keep our communities clean and green.
+              We collect from pickup bins and gatherers, clean and compress plastic, then sell to our recycling partner.
             </p>
           </div>
       </div>

@@ -5,7 +5,15 @@ import { db } from '../firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'; 
 import imageCompression from 'browser-image-compression';
 import emailjs from '@emailjs/browser'; 
-import CustomAlert from '../components/CustomAlert'; // <--- 1. IMPORT CUSTOM ALERT
+import CustomAlert from '../components/CustomAlert';
+import DataConsentCheckbox from '../components/DataConsentCheckbox';
+import {
+  getServiceAreaNames,
+  getPickupDay,
+  formatServiceAreaLabel,
+  WEEKLY_PICKUP_FEE_NGN,
+} from '../constants/serviceAreas';
+import { inferZone } from '../services/logisticsService';
 
 // --- CUSTOM HELPER FOR BASE64 ---
 const convertToBase64 = (file) => {
@@ -17,7 +25,7 @@ const convertToBase64 = (file) => {
   });
 };
 
-const GlassDropdown = ({ label, icon: Icon, options, placeholder, value, onChange }) => {
+const GlassDropdown = ({ label, icon: Icon, options, placeholder, value, onChange, formatOption = (o) => o }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -46,7 +54,7 @@ const GlassDropdown = ({ label, icon: Icon, options, placeholder, value, onChang
       >
         <Icon size={18} className="absolute left-3 text-slate-900" />
         <span className={`text-sm font-medium ${value ? 'text-slate-900' : 'text-slate-500'}`}>
-            {value || placeholder}
+            {value ? formatOption(value) : placeholder}
         </span>
         <ChevronDown size={18} className={`text-slate-900 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
       </div>
@@ -61,7 +69,7 @@ const GlassDropdown = ({ label, icon: Icon, options, placeholder, value, onChang
                         className="px-4 py-3 text-sm font-medium text-slate-700 hover:bg-green-50 hover:text-green-800 cursor-pointer transition-colors flex items-center gap-2"
                     >
                         {value === option && <CheckCircle size={14} className="text-green-600" />}
-                        {option}
+                        {formatOption(option)}
                     </div>
                 ))}
             </div>
@@ -75,12 +83,14 @@ const BookPickup = () => {
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
+    zone: '',
     address: '',
     landmark: '',
     wasteType: '',
     bagSize: '',
-    count: 1
+    count: 1,
   });
+  const [consentAccepted, setConsentAccepted] = useState(false);
 
   const [imageFile, setImageFile] = useState(null); 
   const [imagePreview, setImagePreview] = useState(null); 
@@ -126,9 +136,13 @@ const BookPickup = () => {
                 const data = await response.json();
 
                 if (data && data.display_name) {
+                    const detectedZone = inferZone(data.display_name);
                     setFormData(prev => ({
                         ...prev,
-                        address: data.display_name 
+                        address: data.display_name,
+                        zone: detectedZone && getServiceAreaNames().includes(detectedZone)
+                          ? detectedZone
+                          : prev.zone,
                     }));
                 } else {
                     // Replaced alert
@@ -177,13 +191,22 @@ const BookPickup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if(!formData.fullName || !formData.phone || !formData.address || !formData.wasteType) {
-        // Replaced alert
+    if(!formData.fullName || !formData.phone || !formData.zone || !formData.address || !formData.wasteType) {
         setAlertConfig({ 
             isOpen: true, 
             type: 'error', 
             title: 'Missing Details', 
-            message: 'Please fill in all required fields to proceed.' 
+            message: 'Please select your service area and fill in all required fields.' 
+        });
+        return;
+    }
+
+    if (!consentAccepted) {
+        setAlertConfig({
+            isOpen: true,
+            type: 'error',
+            title: 'Consent Required',
+            message: 'Please accept our Privacy Policy to submit your pickup request.',
         });
         return;
     }
@@ -197,18 +220,24 @@ const BookPickup = () => {
             imageUrl = await convertToBase64(imageFile);
         }
 
+        const fullAddress = [formData.address, formData.zone].filter(Boolean).join(', ');
+
         const emailParams = {
             user_name: formData.fullName,
             user_phone: formData.phone,
-            user_address: formData.address + (formData.landmark ? ` (Landmark: ${formData.landmark})` : ''),
+            user_address: fullAddress + (formData.landmark ? ` (Landmark: ${formData.landmark})` : ''),
             waste_type: formData.wasteType,
             bag_size: formData.bagSize || "Not specified",
             count: formData.count,
-            pickup_date: new Date().toLocaleDateString()
+            pickup_date: getPickupDay(formData.zone) || 'Scheduled',
         };
 
         await addDoc(collection(db, "pickups"), {
             ...formData,
+            address: fullAddress,
+            weeklyFee: WEEKLY_PICKUP_FEE_NGN,
+            pickupDay: getPickupDay(formData.zone),
+            paymentMethod: 'Cash on pickup',
             imageUrl: imageUrl, 
             status: "Pending",
             createdAt: serverTimestamp()
@@ -226,10 +255,11 @@ const BookPickup = () => {
             isOpen: true, 
             type: 'success', 
             title: 'Pickup Scheduled!', 
-            message: 'Our logistics team has received your request. We will contact you shortly.' 
+            message: `Your request is confirmed. We collect in ${formData.zone} on ${getPickupDay(formData.zone)}s. Pay ₦${WEEKLY_PICKUP_FEE_NGN.toLocaleString()} in cash when our team arrives.` 
         });
         
-        setFormData({ fullName: '', phone: '', address: '', landmark: '', wasteType: '', bagSize: '', count: 1 });
+        setFormData({ fullName: '', phone: '', zone: '', address: '', landmark: '', wasteType: '', bagSize: '', count: 1 });
+        setConsentAccepted(false);
         setImageFile(null);
         setImagePreview(null);
 
@@ -265,24 +295,53 @@ const BookPickup = () => {
                   <div className="relative z-10">
                       <span className="inline-block px-3 py-1 rounded-full border border-white/20 text-xs font-medium mb-6 text-[#C3F53C]">Logistics</span>
                       <h2 className="text-4xl font-bold leading-tight mb-4">Schedule a <br/> <span className="text-[#C3F53C]">Pickup</span></h2>
-                      <p className="text-slate-300 text-sm leading-relaxed mb-8">Submit your request and our AI logistics team will verify your waste.</p>
+                      <p className="text-slate-300 text-sm leading-relaxed mb-4">
+                        Weekly door-to-door collection in our service areas. ₦{WEEKLY_PICKUP_FEE_NGN.toLocaleString()} per week, paid in cash on pickup to sustain logistics, not for profit.
+                      </p>
+                      <div className="bg-white/10 border border-white/20 rounded-xl p-4 mb-6">
+                        <p className="text-xs text-[#C3F53C] font-bold uppercase tracking-wider mb-1">Drop-off option</p>
+                        <p className="text-xs text-slate-300 leading-relaxed">Bring bottles to us directly and get paid cash. No weekly fee applies.</p>
+                      </div>
                       
                       <div className="space-y-6">
-                          <div className="flex gap-4"><div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shrink-0 text-[#C3F53C]">1</div><div><h4 className="font-bold text-sm">Fill Details</h4><p className="text-xs text-slate-400">Location & Waste type</p></div></div>
-                          <div className="flex gap-4"><div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shrink-0 text-[#C3F53C]">2</div><div><h4 className="font-bold text-sm">We Verify</h4><p className="text-xs text-slate-400">Confirm quantity</p></div></div>
-                          <div className="flex gap-4"><div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shrink-0 text-[#C3F53C]">3</div><div><h4 className="font-bold text-sm">Pickup Scheduled</h4><p className="text-xs text-slate-400">Driver assigned</p></div></div>
+                          <div className="flex gap-4"><div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shrink-0 text-[#C3F53C]">1</div><div><h4 className="font-bold text-sm">Select Your Area</h4><p className="text-xs text-slate-400">Only listed locations are served</p></div></div>
+                          <div className="flex gap-4"><div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shrink-0 text-[#C3F53C]">2</div><div><h4 className="font-bold text-sm">We Collect on Your Day</h4><p className="text-xs text-slate-400">Each area has a fixed pickup day</p></div></div>
+                          <div className="flex gap-4"><div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shrink-0 text-[#C3F53C]">3</div><div><h4 className="font-bold text-sm">Pay on Pickup</h4><p className="text-xs text-slate-400">₦{WEEKLY_PICKUP_FEE_NGN.toLocaleString()} cash weekly</p></div></div>
                       </div>
                   </div>
-                  <div className="relative z-10 text-xs text-slate-400 mt-10">Questions? Call +234 800 KANEM</div>
+                  <div className="relative z-10 text-xs text-slate-400 mt-10">
+                    Questions? Call{' '}
+                    <a href="tel:+2348080210809" className="text-[#C3F53C] font-bold hover:underline">
+                      +234 808 021 0809
+                    </a>
+                  </div>
               </div>
 
               <div className="lg:col-span-3 p-8 md:p-12 bg-white/40 backdrop-blur-md border-l border-white/20">
-                  <h3 className="text-2xl font-bold text-slate-900 mb-6 drop-shadow-sm">Pickup Details</h3>
+                  <h3 className="text-2xl font-bold text-slate-900 mb-2 drop-shadow-sm">Pickup Details</h3>
+                  <p className="text-sm text-slate-500 mb-6">
+                    Don&apos;t see your area? We don&apos;t operate there yet.{' '}
+                    <span className="font-bold text-[#1a4032]">₦{WEEKLY_PICKUP_FEE_NGN.toLocaleString()}/week</span>, cash on pickup.
+                  </p>
                   
                   <form className="space-y-6" onSubmit={handleSubmit}>
                       
                       <div className="space-y-4">
                           <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Contact & Location</h4>
+                          <GlassDropdown
+                            label="Service Area"
+                            icon={MapPin}
+                            placeholder="Select your area..."
+                            value={formData.zone}
+                            onChange={(val) => handleDropdownChange('zone', val)}
+                            options={getServiceAreaNames()}
+                            formatOption={formatServiceAreaLabel}
+                          />
+                          {formData.zone && (
+                            <div className="bg-[#E8F89C]/50 border border-[#C3F53C]/30 rounded-xl px-4 py-3 text-sm text-[#1a4032] font-medium">
+                              Pickup day for {formData.zone}: <strong>{getPickupDay(formData.zone)}s</strong>. Pay ₦{WEEKLY_PICKUP_FEE_NGN.toLocaleString()} in cash when we arrive.
+                            </div>
+                          )}
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               <div className="space-y-1">
                                   <label className="text-sm font-bold text-slate-800">Full Name</label>
@@ -353,7 +412,13 @@ const BookPickup = () => {
                           </div>
                       </div>
 
-                      <button type="submit" disabled={isSubmitting || isCompressing} className="w-full bg-[#1a4032] hover:bg-[#143328] text-white font-bold py-4 rounded-xl shadow-xl hover:shadow-2xl transition-all hover:scale-[1.01] mt-6 flex items-center justify-center gap-2 relative overflow-hidden group disabled:opacity-70 disabled:cursor-not-allowed">
+                      <DataConsentCheckbox
+                        checked={consentAccepted}
+                        onChange={setConsentAccepted}
+                        id="pickup-consent"
+                      />
+
+                      <button type="submit" disabled={isSubmitting || isCompressing} className="w-full bg-[#1a4032] hover:bg-[#143328] text-white font-bold py-4 rounded-xl shadow-xl hover:shadow-2xl transition-all hover:scale-[1.01] mt-2 flex items-center justify-center gap-2 relative overflow-hidden group disabled:opacity-70 disabled:cursor-not-allowed">
                           <span className="relative z-10 flex items-center gap-2">
                              {isSubmitting ? (<>Processing... <Loader2 className="animate-spin" size={20} /></>) : (<>Submit Request <CheckCircle size={20} className="text-[#C3F53C]" /></>)}
                           </span>

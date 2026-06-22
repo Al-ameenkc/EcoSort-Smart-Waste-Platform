@@ -3,54 +3,9 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css';
 import { Truck, Navigation, ExternalLink, Calculator, ArrowRight, MapPin, Flag, ChevronDown, Search, Check } from 'lucide-react';
 import L from 'leaflet';
+import { ZONE_ANCHORS } from '../constants/abujaZones';
 
-// --- LEAFLET ICON FIX ---
-import icon from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
-let DefaultIcon = L.icon({
-    iconUrl: icon,
-    shadowUrl: iconShadow,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41]
-});
-L.Marker.prototype.options.icon = DefaultIcon;
-
-// --- EXPANDED ABUJA COORDINATES ---
-const ANCHORS = {
-  'Central Area': [9.0500, 7.4950],
-  'Wuse': [9.0600, 7.4700],
-  'Wuse 2': [9.0700, 7.4800],
-  'Maitama': [9.0882, 7.4980],
-  'Asokoro': [9.0495, 7.5191],
-  'Garki': [9.0300, 7.4900],
-  'Garki II': [9.0400, 7.4850],
-  'Guzape': [9.0350, 7.5100],
-  'Utako': [9.0650, 7.4450],
-  'Jabi': [9.0765, 7.4200],
-  'Wuye': [9.0450, 7.4550],
-  'Mabushi': [9.0850, 7.4550],
-  'Katampe': [9.0950, 7.4650],
-  'Katampe Ext.': [9.1050, 7.4700],
-  'Jahi': [9.0850, 7.4350],
-  'Gwarimpa': [9.1099, 7.4050],
-  'Life Camp': [9.0700, 7.3900],
-  'Kado': [9.0800, 7.4100],
-  'Dakibiyu': [9.0500, 7.4300],
-  'Durumi': [9.0150, 7.4600],
-  'Gaduwa': [9.0050, 7.4650],
-  'Lokogoma': [8.9900, 7.4700],
-  'Apo': [9.0100, 7.4900],
-  'Apo Resettlement': [9.0000, 7.5050],
-  'Galadimawa': [9.0000, 7.4400],
-  'Games Village': [9.0250, 7.4650],
-  'Lugbe': [8.9800, 7.3600],
-  'Mpape': [9.1400, 7.4900],
-  'Dawaki': [9.1300, 7.4100],
-  'Kubwa': [9.1500, 7.3300],
-  'Dei-Dei': [9.1100, 7.2900],
-  'Nyanya': [9.0300, 7.5600],
-  'Karu': [9.0100, 7.5500]
-};
+const ANCHORS = ZONE_ANCHORS;
 
 // --- CUSTOM ICONS ---
 const startIcon = new L.Icon({

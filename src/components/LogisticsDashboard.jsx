@@ -180,7 +180,7 @@ const LogisticsDashboard = ({ floodReports = [] }) => {
               </p>
               <p className="text-sm md:text-base font-bold">
                 {actionableAlerts.length > 0
-                  ? `${actionableAlerts.length} reported hazard${actionableAlerts.length !== 1 ? 's' : ''} in rain-affected zone${actionableAlerts.length !== 1 ? 's' : ''} — investigation route ready`
+                  ? `${actionableAlerts.length} reported hazard${actionableAlerts.length !== 1 ? 's' : ''} in rain-affected zone${actionableAlerts.length !== 1 ? 's' : ''}. Investigation route ready`
                   : rainAlerts.hasAlerts
                     ? 'Rain forecast active, but no reported hazards in affected zones'
                     : 'No rain forecast in Abuja zones (next 48h)'}
@@ -250,8 +250,8 @@ const LogisticsDashboard = ({ floodReports = [] }) => {
             {openReports.length > 0 && rainAlerts.hasAlerts
               ? 'No hazard reports match rain-affected zones'
               : openReports.length > 0
-                ? 'Hazard reports on file — waiting for rain forecast in those zones'
-                : 'All clear — no flood response needed'}
+                ? 'Hazard reports on file. Waiting for rain forecast in those zones'
+                : 'All clear. No flood response needed'}
           </p>
           <p className="text-sm text-slate-500 mt-1 max-w-md mx-auto">
             {reportsMissingZone.length > 0
@@ -301,7 +301,7 @@ const LogisticsDashboard = ({ floodReports = [] }) => {
                   <div key={section.zone || 'all'}>
                     {section.zone && (
                       <div className="text-xs font-bold uppercase tracking-wider mb-2 px-2 py-1 rounded-lg bg-amber-100 text-amber-800">
-                        ⚠ {section.zone} — investigate first
+                        ⚠ {section.zone}: investigate first
                       </div>
                     )}
                     <div className="space-y-2">

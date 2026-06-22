@@ -3,7 +3,8 @@ import { createPortal } from 'react-dom';
 import { X, User, Phone, MessageCircle, Heart, Loader2 } from 'lucide-react';
 import { joinMovement } from '../services/volunteerService'; 
 import emailjs from '@emailjs/browser';
-import CustomAlert from './CustomAlert'; // <--- 1. Import CustomAlert
+import CustomAlert from './CustomAlert';
+import DataConsentCheckbox from './DataConsentCheckbox';
 
 const JoinUsModal = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
@@ -12,6 +13,7 @@ const JoinUsModal = ({ isOpen, onClose }) => {
     whatsapp: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [consentAccepted, setConsentAccepted] = useState(false);
 
   // --- 2. Alert State ---
   const [alertConfig, setAlertConfig] = useState({ 
@@ -48,6 +50,16 @@ const JoinUsModal = ({ isOpen, onClose }) => {
         return;
     }
 
+    if (!consentAccepted) {
+        setAlertConfig({
+            isOpen: true,
+            type: 'error',
+            title: 'Consent Required',
+            message: 'Please accept our Privacy Policy to join.',
+        });
+        return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -77,7 +89,8 @@ const JoinUsModal = ({ isOpen, onClose }) => {
             }
 
             // --- 3. Show Success Alert ---
-            setFormData({ fullName: '', phone: '', whatsapp: '' }); 
+            setFormData({ fullName: '', phone: '', whatsapp: '' });
+            setConsentAccepted(false);
             setAlertConfig({
                 isOpen: true,
                 type: 'success',
@@ -197,6 +210,12 @@ const JoinUsModal = ({ isOpen, onClose }) => {
                     You will hear from us within 48hrs of weekdays.
                 </p>
             </div>
+
+            <DataConsentCheckbox
+              checked={consentAccepted}
+              onChange={setConsentAccepted}
+              id="join-consent"
+            />
 
             <button 
                 onClick={handleSubmit}

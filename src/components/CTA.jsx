@@ -26,7 +26,7 @@ const CTA = () => {
             
             {/* Updated Text */}
             <p className="text-slate-300 text-base md:text-lg mb-8 leading-relaxed max-w-lg mx-auto">
-                Join our community of eco-warriors today and start making a real impact on the environment.
+                Book weekly pickup in your area, report blocked drains, or bring bottles to us for cash. Every action helps keep Abuja clean and flood-safe.
             </p>
 
             <div className="flex items-center justify-center">

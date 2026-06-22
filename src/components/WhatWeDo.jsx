@@ -9,7 +9,7 @@ const projects = [
     id: 0,
     title: "Plastic Collection",
     badge: "Collection",
-    desc: "Community drives to gather plastic and clean local areas.",
+    desc: "We collect from pickup bins and gatherers, clean and compress plastic, then sell to our recycling partner.",
     img: "https://images.unsplash.com/photo-1595278069441-2cf29f8005a4?q=80&w=2070&auto=format&fit=crop",
     bg: "bg-[#F9FBF6]",
     text: "text-slate-900",
@@ -43,9 +43,9 @@ const projects = [
   },
   {
     id: 3,
-    title: "Smart Logistics", 
+    title: "Flood Prevention", 
     badge: "Technology",      
-    desc: "AI-driven route optimization to minimize carbon emissions and costs.", 
+    desc: "Hands-on drainage clearance synced with live weather alerts.",
     img: greenLogisticsImg, // <--- 2. USED HERE
     bg: "bg-[#C3F53C]",
     text: "text-slate-900",

@@ -14,9 +14,11 @@ import {
 } from 'lucide-react';
 import CustomAlert from './CustomAlert';
 import { submitFloodReport } from '../services/floodReportService';
-import { ZONE_ANCHORS, inferZone } from '../services/logisticsService';
+import { inferZone } from '../services/logisticsService';
+import { getServiceAreaNames, formatServiceAreaLabel } from '../constants/serviceAreas';
+import DataConsentCheckbox from './DataConsentCheckbox';
 
-const ZONE_OPTIONS = Object.keys(ZONE_ANCHORS).sort();
+const ZONE_OPTIONS = getServiceAreaNames();
 
 const REPORT_META = {
   drainage_blockage: {
@@ -45,6 +47,7 @@ const ReportHazardModal = ({ isOpen, onClose, reportType = 'drainage_blockage' }
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
+  const [consentAccepted, setConsentAccepted] = useState(false);
   const [alertConfig, setAlertConfig] = useState({
     isOpen: false,
     type: 'success',
@@ -108,7 +111,9 @@ const ReportHazardModal = ({ isOpen, onClose, reportType = 'drainage_blockage' }
             ...prev,
             coordinates: coords,
             address: displayName || prev.address,
-            zone: detectedZone || prev.zone,
+            zone: detectedZone && ZONE_OPTIONS.includes(detectedZone)
+              ? detectedZone
+              : prev.zone,
           }));
         } catch {
           setFormData((prev) => ({
@@ -141,6 +146,16 @@ const ReportHazardModal = ({ isOpen, onClose, reportType = 'drainage_blockage' }
         type: 'error',
         title: 'Missing Information',
         message: 'Please provide your name, phone, and select your area.',
+      });
+      return;
+    }
+
+    if (!consentAccepted) {
+      setAlertConfig({
+        isOpen: true,
+        type: 'error',
+        title: 'Consent Required',
+        message: 'Please accept our Privacy Policy to submit your report.',
       });
       return;
     }
@@ -247,11 +262,12 @@ const ReportHazardModal = ({ isOpen, onClose, reportType = 'drainage_blockage' }
                   <option value="">Select your area...</option>
                   {ZONE_OPTIONS.map((zone) => (
                     <option key={zone} value={zone}>
-                      {zone}
+                      {formatServiceAreaLabel(zone)}
                     </option>
                   ))}
                 </select>
               </div>
+              <p className="text-[10px] text-slate-400">Only areas we operate in are listed. Don&apos;t see yours? We haven&apos;t expanded there yet.</p>
             </div>
 
             <div className="space-y-1">
@@ -290,6 +306,12 @@ const ReportHazardModal = ({ isOpen, onClose, reportType = 'drainage_blockage' }
                 placeholder="Describe the blockage or flood..."
               />
             </div>
+
+            <DataConsentCheckbox
+              checked={consentAccepted}
+              onChange={setConsentAccepted}
+              id="hazard-consent"
+            />
 
             <button
               type="submit"
