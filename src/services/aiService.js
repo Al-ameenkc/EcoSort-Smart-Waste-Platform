@@ -154,11 +154,11 @@ export const identifyWaste = async (imageInput) => {
     return JSON.parse(content);
   } catch (error) {
     console.error('Identify Error:', error);
-    throw new Error(formatAiError(error, 'SnapSort'));
+    throw new Error('System busy');
   }
 };
 
-export const chatAboutWaste = async (message, context) => {
+export const chatAboutWaste = async (message, context, options = {}) => {
   try {
     const contextString = context.itemName
       ? `User is currently looking at: ${context.itemName}.`
@@ -173,6 +173,9 @@ export const chatAboutWaste = async (message, context) => {
     return await callMySecureAPI(messages, false);
   } catch (error) {
     console.error('Chat Error:', error);
+    if (options.genericError) {
+      throw new Error('System busy');
+    }
     return formatAiError(error, 'Eco-AI');
   }
 };

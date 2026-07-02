@@ -7,7 +7,9 @@ import VolunteerDetailModal from '../components/admin/VolunteerDetailModal';
 import RouteOptimizer from './RouteOptimizer';
 import LogisticsDashboard from '../components/LogisticsDashboard';
 import FloodReportsPanel from '../components/admin/FloodReportsPanel';
-import { CheckCircle, Clock, MapPin, Package, Phone, Truck, Image as ImageIcon, ChevronLeft, ChevronRight, Filter, Users, MessageCircle, Heart, Menu } from 'lucide-react';
+import { CheckCircle, Clock, MapPin, Package, Phone, Truck, Image as ImageIcon, ChevronLeft, ChevronRight, Filter, Users, MessageCircle, Heart, Menu, FileDown } from 'lucide-react';
+import { exportPickupsToPdf } from '../utils/exportPickupsPdf';
+import { generateMockPickups } from '../utils/generateMockPickups';
 
 const AdminDashboard = ({ onLogout }) => {
   const [activeTab, setActiveTab] = useState('pickups');
@@ -72,6 +74,32 @@ const AdminDashboard = ({ onLogout }) => {
       setCurrentPage(1); 
   };
 
+  const handleExportPickupsPdf = () => {
+    const result = exportPickupsToPdf(filteredData, { filterStatus });
+    if (!result.success) {
+      window.alert(result.error);
+    }
+  };
+
+  const handleExportDemoPickupsPdf = () => {
+    const demoPickups = generateMockPickups({
+      total: 30,
+      maxTotal: 30,
+      startDate: new Date(2026, 0, 12),
+      endDate: new Date(),
+      includePhone: false,
+    });
+    const stamp = new Date().toISOString().slice(0, 10);
+    const result = exportPickupsToPdf(demoPickups, {
+      filterStatus: 'All',
+      includePhone: false,
+      filename: `kanemwaste-pickups-demo-${stamp}.pdf`,
+    });
+    if (!result.success) {
+      window.alert(result.error);
+    }
+  };
+
   useEffect(() => { setCurrentPage(1); }, [activeTab]);
 
   return (
@@ -106,17 +134,35 @@ const AdminDashboard = ({ onLogout }) => {
                 </div>
                 
                 {activeTab === 'pickups' && (
-                    <div className="w-full sm:w-auto flex items-center gap-2 bg-white p-2 rounded-xl border border-slate-200 shadow-sm">
-                        <Filter size={14} className="text-slate-400 shrink-0" />
-                        <select
-                            value={filterStatus}
-                            onChange={(e) => handleFilterChange(e.target.value)}
-                            className="w-full sm:w-auto min-w-[170px] px-2 py-1.5 rounded-lg border border-slate-200 text-xs sm:text-sm font-medium text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-[#1a4032]/20 focus:border-[#1a4032]"
+                    <div className="w-full sm:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                        <div className="flex items-center gap-2 bg-white p-2 rounded-xl border border-slate-200 shadow-sm">
+                            <Filter size={14} className="text-slate-400 shrink-0" />
+                            <select
+                                value={filterStatus}
+                                onChange={(e) => handleFilterChange(e.target.value)}
+                                className="w-full sm:w-auto min-w-[170px] px-2 py-1.5 rounded-lg border border-slate-200 text-xs sm:text-sm font-medium text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-[#1a4032]/20 focus:border-[#1a4032]"
+                            >
+                                {['All', 'Pending', 'Assigned', 'Completed'].map((status) => (
+                                    <option key={status} value={status}>{status}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={handleExportPickupsPdf}
+                            className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#1a4032] text-white text-xs sm:text-sm font-bold hover:bg-[#143326] transition-colors shadow-sm"
                         >
-                            {['All', 'Pending', 'Assigned', 'Completed'].map((status) => (
-                                <option key={status} value={status}>{status}</option>
-                            ))}
-                        </select>
+                            <FileDown size={16} />
+                            Export PDF
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleExportDemoPickupsPdf}
+                            className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm font-bold hover:bg-slate-50 transition-colors shadow-sm"
+                        >
+                            <FileDown size={16} />
+                            Export Demo PDF
+                        </button>
                     </div>
                 )}
             </div>

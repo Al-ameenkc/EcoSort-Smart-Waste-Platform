@@ -59,7 +59,7 @@ const SnapSortSidebar = ({ isOpen, onClose, image, onScanAgain }) => {
         ...prev,
         {
           role: 'error',
-          text: error.message || 'Could not analyze image. It might be too large or the server is busy.',
+          text: 'System busy',
         },
       ]);
     } finally {
@@ -113,9 +113,15 @@ const SnapSortSidebar = ({ isOpen, onClose, image, onScanAgain }) => {
     setInput("");
     setMessages(prev => [...prev, { role: 'user', text: q }]);
     setIsChatting(true);
-    const ans = await chatAboutWaste(q, latestAnalysis);
-    setMessages(prev => [...prev, { role: 'bot', text: ans }]);
-    setIsChatting(false);
+    try {
+      const ans = await chatAboutWaste(q, latestAnalysis, { genericError: true });
+      setMessages(prev => [...prev, { role: 'bot', text: ans }]);
+    } catch (error) {
+      console.error('Chat failed:', error);
+      setMessages(prev => [...prev, { role: 'error', text: 'System busy' }]);
+    } finally {
+      setIsChatting(false);
+    }
   };
 
   const hasPendingImage = currentImage && !latestAnalysis && !isScanning;
@@ -156,7 +162,6 @@ const SnapSortSidebar = ({ isOpen, onClose, image, onScanAgain }) => {
                 >
                   Analyze with AI
                 </button>
-                <p className="text-[10px] text-slate-400 text-center w-full">One AI request at a time. Nothing is sent until you tap Analyze.</p>
               </div>
             )}
             
